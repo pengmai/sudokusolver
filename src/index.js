@@ -6,6 +6,7 @@ import './index.css';
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}>
+      {props.value === 0 ? "" : props.value}
     </button>
   );
 }
@@ -13,17 +14,32 @@ function Square(props) {
 class Board extends React.Component {
   constructor() {
     super();
-    this.state = {}
+    var row = Array(9).fill(0);
+    var rows = [];
+    for (var i = 0; i < 9; i++) {
+      rows.push(row.slice());
+    }
+
+    this.state = {
+      board: rows
+    }
   }
 
   handleClick(i) {
-    console.log("Clicked square " + i);
+    //console.log("Clicked square " + i);
+    const row = Math.floor(i / 9);
+    const col = i % 9;
+    const board = this.state.board.slice();
+    board[row][col] < 9 ? board[row][col]++ : board[row][col] = 0;
+    this.setState({
+      board: board
+    });
   }
 
   renderSquare(i) {
     return (
       <Square
-        value={i}
+        value={this.state.board[Math.floor(i / 9)][i % 9]}
         onClick={() => this.handleClick(i)}
       />
     );

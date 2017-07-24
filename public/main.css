@@ -9,9 +9,11 @@
 }
 
 .square {
+  color: #ccc;
   background: white;
   border: None;
-  font-size: 24px;
+  font-family: Arial;
+  font-size: 26px;
   font-weight: bold;
   line-height: 56px;
   height: 56px;
@@ -22,6 +24,7 @@
 @media only screen and (max-width: 600px) {
   .square {
     height: 36px;
+    line-height: 36px;
     width: 36px;
   }
 }
