@@ -19,6 +19,13 @@
   width: 56px;
 }
 
+@media only screen and (max-width: 600px) {
+  .square {
+    height: 36px;
+    width: 36px;
+  }
+}
+
 .square:focus {
   outline: none;
 }
