@@ -4,34 +4,17 @@
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
 
-  /*top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  margin: auto;*/
-
   border-collapse: collapse;
   border: 3px solid #ccc;
 }
 
-/*.board-row:after {
-  clear: both;
-  content: "";
-  display: table;
-}*/
-
 .square {
   background: white;
   border: None;
-  /*float: left;*/
   font-size: 24px;
   font-weight: bold;
   line-height: 56px;
   height: 56px;
-  /*margin-right: -1px;
-  margin-top: -1px;*/
-  /*padding: 0;*/
   /*text-align: center;*/
   width: 56px;
 }
