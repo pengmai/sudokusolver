@@ -10,31 +10,43 @@
 
   margin: auto;
 
-  border: 5px solid black;
-  padding-top: 1px;
+  border-collapse: collapse;
+  border: 5px solid #ccc;
 }
 
-.board-row:after {
+/*.board-row:after {
   clear: both;
   content: "";
   display: table;
-}
+}*/
 
 .square {
-  background: #fff;
-  border: 1px solid #999;
-  float: left;
+  background: white;
+  border: None;
+  /*float: left;*/
   font-size: 24px;
   font-weight: bold;
   line-height: 56px;
   height: 56px;
-  margin-right: -1px;
-  margin-top: -1px;
-  padding: 0;
-  text-align: center;
+  /*margin-right: -1px;
+  margin-top: -1px;*/
+  /*padding: 0;*/
+  /*text-align: center;*/
   width: 56px;
 }
 
 .square:focus {
   outline: none;
+}
+
+td {
+  border: 1px solid #ccc;
+}
+
+td:nth-child(3n) {
+  border-right: 5px solid #ccc;
+}
+
+tr:nth-child(3n) td {
+  border-bottom: 5px solid #ccc;
 }

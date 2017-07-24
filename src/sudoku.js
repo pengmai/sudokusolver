@@ -1,3 +1,6 @@
+/**
+ * This class currently isn't being used.
+ */
 function newSquare(i, j) {
   return {
     value: 0,
