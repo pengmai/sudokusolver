@@ -23,7 +23,8 @@ class Board extends React.Component {
     }
 
     this.state = {
-      board: rows
+      board: rows,
+      error: ""
     }
   }
 
@@ -35,7 +36,6 @@ class Board extends React.Component {
     board[row][col] < 9 ? board[row][col]++ : board[row][col] = 0;
     this.setState({
       board: board,
-      error: ""
     });
   }
 
@@ -48,18 +48,16 @@ class Board extends React.Component {
     );
   }
 
-  solve() {
-    try {
-      fetch('/api/v1/sudokuapi.php?request=ping', {
-        accept: 'application/json',
-      }).then(Client.checkStatus)
-        .then(Client.parseJSON)
-        .then((response) => (console.log(response.text)));
-    } catch (err) {
-      this.setState({
-        error: "There appears to be an error. Please try again."
+  handleButton() {
+    console.log("Inside handleButton");
+    Client.solve(this.state.board)
+      .then(solution => {
+        // This is stupid, fix the API and then use JSON.parse
+        var newBoard = [];
+        while (solution.length > 0) newBoard.push(solution.splice(0, 9));
+        this.setState({board: newBoard});
       });
-    }
+    console.log("Reached end of handleButton");
   }
 
   render() {
@@ -169,7 +167,7 @@ class Board extends React.Component {
           </tbody>
         </table>
 
-        <button className="solveButton" onClick={() => this.solve()}>
+        <button className="solveButton" onClick={() => this.handleButton()}>
           solve
         </button>
         <p id="errorMessage">{this.state.error}</p>
