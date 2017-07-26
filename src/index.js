@@ -16,16 +16,22 @@ function Square(props) {
 class Board extends React.Component {
   constructor() {
     super();
+    var rows = this.getEmptyBoard();
+
+    this.state = {
+      board: rows,
+      solved: false,
+      error: ""
+    }
+  }
+
+  getEmptyBoard() {
     var row = Array(9).fill(0);
     var rows = [];
     for (var i = 0; i < 9; i++) {
       rows.push(row.slice());
     }
-
-    this.state = {
-      board: rows,
-      error: ""
-    }
+    return rows;
   }
 
   handleClick(i) {
@@ -49,15 +55,29 @@ class Board extends React.Component {
   }
 
   handleButton() {
-    console.log("Inside handleButton");
-    Client.solve(this.state.board)
-      .then(solution => {
-        // This is stupid, fix the API and then use JSON.parse
-        var newBoard = [];
-        while (solution.length > 0) newBoard.push(solution.splice(0, 9));
-        this.setState({board: newBoard});
+    if (this.state.solved) {
+      // Reset the board
+      var board = this.getEmptyBoard();
+      this.setState({
+        board: board,
+        solved: false
       });
-    console.log("Reached end of handleButton");
+    } else {
+      Client.solve(this.state.board)
+        .then(response => {
+          if (response.hasOwnProperty("error")) {
+            this.setState({
+              error: "There was a problem connecting to the server."
+            });
+          } else {
+            this.setState({
+              board: response.solution,
+              solved: true,
+              error: ""
+            });
+          }
+        });
+    }
   }
 
   render() {
@@ -168,7 +188,7 @@ class Board extends React.Component {
         </table>
 
         <button className="solveButton" onClick={() => this.handleButton()}>
-          solve
+          {this.state.solved ? "reset" : "solve"}
         </button>
         <p id="errorMessage">{this.state.error}</p>
       </div>

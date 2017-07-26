@@ -6,18 +6,14 @@ function checkStatus(response) {
 }
 
 function parseJSON(response) {
-  var obj = response.json();
-  if (obj.hasOwnProperty("error")) {
-    throwError(response);
-  }
-  return obj;
+  return response.json();
 }
 
 function throwError(response) {
   const error = new Error(`HTTP Error ${response.statusText}`);
   error.status = response.statusText;
   error.response = response;
-  console.log(error); // eslint-disable-line no-console
+  //console.log(error); // eslint-disable-line no-console
   throw error;
 }
 
@@ -29,14 +25,17 @@ function solve(board) {
       element => Array.isArray(element) ? flatten(element) : element));
   var param = flatten(board).join("");
 
-  var headers = new Headers();
-  headers.append("accept", "application/json");
+  var headers = new Headers({
+    "accept": "application/json"
+  });
   var init = {method: 'POST', headers: headers, mode: 'cors'};
   var req = new Request('/api/v1/sudokuapi.php?request=solve/' + param, init);
   return fetch(req)
     .then(checkStatus)
     .then(parseJSON)
-    .then((response) => (response.solution));
+    .catch(err => ({error: err.response}));
+    //.then((response) => (response.solution))
+    //.catch((err) => (err.error));
 }
 
 const Client = { solve };
