@@ -1,0 +1,46 @@
+.board {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+
+  border-collapse: collapse;
+  border: 3px solid #ccc;
+}
+
+.square {
+  color: #ccc;
+  background: white;
+  border: None;
+  font-family: Arial;
+  font-size: 26px;
+  font-weight: bold;
+  line-height: 36px;
+  height: 36px;
+  /*text-align: center;*/
+  width: 36px;
+}
+
+@media only screen and (min-width: 600px) {
+  .square {
+    height: 56px;
+    line-height: 56px;
+    width: 56px;
+  }
+}
+
+.square:focus {
+  outline: none;
+}
+
+td {
+  border: 1px solid #ccc;
+}
+
+td:nth-child(3n) {
+  border-right: 3px solid #ccc;
+}
+
+tr:nth-child(3n) td {
+  border-bottom: 3px solid #ccc;
+}
