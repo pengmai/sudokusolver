@@ -1,13 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Client from './client.js';
+import Sudoku from './sudoku.js';
 import './index.css';
 import './sudokuboard.css';
 //import registerServiceWorker from './registerServiceWorker';
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button
+        className="square"
+        onClick={props.onClick}
+        style={{color: props.valid ? "" : "red"}}>
       {props.value === 0 ? "" : props.value}
     </button>
   );
@@ -16,40 +20,51 @@ function Square(props) {
 class Board extends React.Component {
   constructor() {
     super();
-    var rows = this.getEmptyBoard();
+    var rows = this.getBoardSetTo(0);
+    var valid = this.getBoardSetTo(1);
 
     this.state = {
       board: rows,
+      valid: valid,
       solved: false,
       error: ""
     }
   }
 
-  getEmptyBoard() {
-    var row = Array(9).fill(0);
+  getBoardSetTo(i) {
+    var row = Array(9).fill(i);
     var rows = [];
-    for (var i = 0; i < 9; i++) {
+    for (var j = 0; j < 9; j++) {
       rows.push(row.slice());
     }
     return rows;
   }
 
   handleClick(i) {
-    //console.log("Clicked square " + i);
     const row = Math.floor(i / 9);
     const col = i % 9;
     const board = this.state.board.slice();
+
+    // Update board.
     board[row][col] < 9 ? board[row][col]++ : board[row][col] = 0;
+
+    // Check for invalid numbers.
+    var valid = Sudoku.checkConflicts(board);
+
     this.setState({
       board: board,
+      valid: valid
     });
   }
 
   renderSquare(i) {
+    const row = Math.floor(i / 9);
+    const col = i % 9;
     return (
       <Square
-        value={this.state.board[Math.floor(i / 9)][i % 9]}
+        value={this.state.board[row][col]}
         onClick={() => this.handleClick(i)}
+        valid={this.state.valid[row][col]}
       />
     );
   }
@@ -57,7 +72,7 @@ class Board extends React.Component {
   handleButton() {
     if (this.state.solved) {
       // Reset the board
-      var board = this.getEmptyBoard();
+      var board = this.getBoardSetTo(0);
       this.setState({
         board: board,
         solved: false
@@ -65,9 +80,10 @@ class Board extends React.Component {
     } else {
       Client.solve(this.state.board)
         .then(response => {
+          console.log(response);
           if (response.hasOwnProperty("error")) {
             this.setState({
-              error: "There was a problem connecting to the server."
+              error: response.error
             });
           } else {
             this.setState({
