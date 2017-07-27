@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Button } from 'react-bootstrap';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
 import './index.css';
@@ -11,6 +12,7 @@ function Square(props) {
     <button
         className="square"
         onClick={props.onClick}
+        disabled={props.disabled}
         style={{color: props.valid ? "" : "red"}}>
       {props.value === 0 ? "" : props.value}
     </button>
@@ -27,8 +29,10 @@ class Board extends React.Component {
       board: rows,
       valid: valid,
       solved: false,
-      error: ""
-    }
+      error: "",
+      loading: false,
+      buttonMessage: "Solve"
+    };
   }
 
   getBoardSetTo(i) {
@@ -65,6 +69,7 @@ class Board extends React.Component {
         value={this.state.board[row][col]}
         onClick={() => this.handleClick(i)}
         valid={this.state.valid[row][col]}
+        disabled={this.state.loading}
       />
     );
   }
@@ -75,9 +80,11 @@ class Board extends React.Component {
       var board = this.getBoardSetTo(0);
       this.setState({
         board: board,
-        solved: false
+        solved: false,
+        buttonMessage: "Solve"
       });
     } else {
+      this.setState({loading: true, buttonMessage: "Solving..."});
       Client.solve(this.state.board)
         .then(response => {
           console.log(response);
@@ -89,7 +96,9 @@ class Board extends React.Component {
             this.setState({
               board: response.solution,
               solved: true,
-              error: ""
+              error: "",
+              loading: false,
+              buttonMessage: "Reset"
             });
           }
         });
@@ -203,9 +212,15 @@ class Board extends React.Component {
           </tbody>
         </table>
 
-        <button className="solveButton" onClick={() => this.handleButton()}>
-          {this.state.solved ? "reset" : "solve"}
-        </button>
+        <div className="text-center">
+          <Button
+            bsStyle="primary"
+            bsSize="large"
+            disabled={this.state.loading}
+            onClick={() => (this.state.loading ? null : this.handleButton())}>
+            {this.state.buttonMessage}
+          </Button>
+        </div>
         <p id="errorMessage">{this.state.error}</p>
       </div>
     )
