@@ -84,8 +84,24 @@ function checkConflicts(board) {
   return valid;
 }
 
-var Sudoku = {
-  checkConflicts
+function hasConflicts(valid) {
+  var i = valid.length;
+
+  while (i--) {
+    var j = valid[i].length;
+    while (j--) {
+      if (valid[i][j] === 0) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
-module.exports = Sudoku;
+const Sudoku = {
+  checkConflicts,
+  hasConflicts
+}
+
+export default Sudoku;

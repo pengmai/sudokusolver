@@ -30,6 +30,7 @@ class Board extends React.Component {
       valid: valid,
       solved: false,
       error: "",
+      cannotSolve: false,
       loading: false,
       buttonMessage: "Solve"
     };
@@ -53,11 +54,14 @@ class Board extends React.Component {
     board[row][col] < 9 ? board[row][col]++ : board[row][col] = 0;
 
     // Check for invalid numbers.
-    var valid = Sudoku.checkConflicts(board);
+    const valid = Sudoku.checkConflicts(board);
+    console.log(valid);
+    const cannotSolve = Sudoku.hasConflicts(valid);
 
     this.setState({
       board: board,
-      valid: valid
+      valid: valid,
+      cannotSolve: cannotSolve
     });
   }
 
@@ -69,7 +73,7 @@ class Board extends React.Component {
         value={this.state.board[row][col]}
         onClick={() => this.handleClick(i)}
         valid={this.state.valid[row][col]}
-        disabled={this.state.loading}
+        disabled={this.state.loading || this.state.solved}
       />
     );
   }
@@ -216,8 +220,9 @@ class Board extends React.Component {
           <Button
             bsStyle="primary"
             bsSize="large"
-            disabled={this.state.loading}
-            onClick={() => (this.state.loading ? null : this.handleButton())}>
+            disabled={this.state.cannotSolve || this.state.loading}
+            onClick={() => (this.state.cannotSolve || this.state.loading ?
+              null : this.handleButton())}>
             {this.state.buttonMessage}
           </Button>
         </div>
