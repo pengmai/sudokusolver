@@ -1,13 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Button } from 'react-bootstrap';
 import Client from './client.js';
+import Sudoku from './sudoku.js';
 import './index.css';
 import './sudokuboard.css';
 //import registerServiceWorker from './registerServiceWorker';
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button
+        className="square"
+        onClick={props.onClick}
+        disabled={props.disabled}
+        style={{color: props.valid ? "" : "red"}}>
       {props.value === 0 ? "" : props.value}
     </button>
   );
@@ -16,40 +22,58 @@ function Square(props) {
 class Board extends React.Component {
   constructor() {
     super();
-    var rows = this.getEmptyBoard();
+    var rows = this.getBoardSetTo(0);
+    var valid = this.getBoardSetTo(1);
 
     this.state = {
       board: rows,
+      valid: valid,
       solved: false,
-      error: ""
-    }
+      error: "",
+      cannotSolve: false,
+      loading: false,
+      buttonMessage: "Solve"
+    };
   }
 
-  getEmptyBoard() {
-    var row = Array(9).fill(0);
+  getBoardSetTo(i) {
+    var row = Array(9).fill(i);
     var rows = [];
-    for (var i = 0; i < 9; i++) {
+    for (var j = 0; j < 9; j++) {
       rows.push(row.slice());
     }
     return rows;
   }
 
   handleClick(i) {
-    //console.log("Clicked square " + i);
     const row = Math.floor(i / 9);
     const col = i % 9;
     const board = this.state.board.slice();
+
+    // Update board.
     board[row][col] < 9 ? board[row][col]++ : board[row][col] = 0;
+
+    // Check for invalid numbers.
+    const valid = Sudoku.checkConflicts(board);
+    console.log(valid);
+    const cannotSolve = Sudoku.hasConflicts(valid);
+
     this.setState({
       board: board,
+      valid: valid,
+      cannotSolve: cannotSolve
     });
   }
 
   renderSquare(i) {
+    const row = Math.floor(i / 9);
+    const col = i % 9;
     return (
       <Square
-        value={this.state.board[Math.floor(i / 9)][i % 9]}
+        value={this.state.board[row][col]}
         onClick={() => this.handleClick(i)}
+        valid={this.state.valid[row][col]}
+        disabled={this.state.loading || this.state.solved}
       />
     );
   }
@@ -57,23 +81,28 @@ class Board extends React.Component {
   handleButton() {
     if (this.state.solved) {
       // Reset the board
-      var board = this.getEmptyBoard();
+      var board = this.getBoardSetTo(0);
       this.setState({
         board: board,
-        solved: false
+        solved: false,
+        buttonMessage: "Solve"
       });
     } else {
+      this.setState({loading: true, buttonMessage: "Solving..."});
       Client.solve(this.state.board)
         .then(response => {
+          console.log(response);
           if (response.hasOwnProperty("error")) {
             this.setState({
-              error: "There was a problem connecting to the server."
+              error: response.error
             });
           } else {
             this.setState({
               board: response.solution,
               solved: true,
-              error: ""
+              error: "",
+              loading: false,
+              buttonMessage: "Reset"
             });
           }
         });
@@ -187,9 +216,16 @@ class Board extends React.Component {
           </tbody>
         </table>
 
-        <button className="solveButton" onClick={() => this.handleButton()}>
-          {this.state.solved ? "reset" : "solve"}
-        </button>
+        <div className="text-center">
+          <Button
+            bsStyle="primary"
+            bsSize="large"
+            disabled={this.state.cannotSolve || this.state.loading}
+            onClick={() => (this.state.cannotSolve || this.state.loading ?
+              null : this.handleButton())}>
+            {this.state.buttonMessage}
+          </Button>
+        </div>
         <p id="errorMessage">{this.state.error}</p>
       </div>
     )
