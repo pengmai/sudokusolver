@@ -14,11 +14,6 @@ function Square(props) {
 }
 
 class Board extends React.Component {
-  constructor(props) {
-    super();
-    this.props = props;
-  }
-
   renderSquare(i) {
     const row = Math.floor(i / 9);
     const col = i % 9;

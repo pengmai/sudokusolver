@@ -67,7 +67,6 @@ class SudokuSolver extends React.Component {
         .then(response => {
           if (response.hasOwnProperty("error")) {
             var error;
-            console.log(response.error);
             switch (response.error) {
               case "Contradiction detected at root.":
                 error = `There appears to be no possible solutions to the
@@ -98,11 +97,13 @@ class SudokuSolver extends React.Component {
   render() {
     return (
       <div>
-        {this.state.error === "" ? "" :
-          <Alert bsStyle="danger">
-            <p>{this.state.error}</p>
-          </Alert>
-        }
+        <div className="text-center">
+          {this.state.error === "" ? "" :
+            <Alert bsStyle="danger">
+              <p>{this.state.error}</p>
+            </Alert>
+          }
+        </div>
 
         <Board
           board={this.state.board}
@@ -111,16 +112,14 @@ class SudokuSolver extends React.Component {
           disabled={this.state.loading || this.state.solved}
         />
 
-        <div className="text-center">
-          <Button
-            bsStyle="info"
-            bsSize="large"
-            disabled={this.state.cannotSolve || this.state.loading}
-            onClick={() => (this.state.cannotSolve || this.state.loading ?
-              null : this.handleButton())}>
-            {this.state.buttonMessage}
-          </Button>
-        </div>
+        <Button
+          bsStyle="info"
+          bsSize="large"
+          disabled={this.state.cannotSolve || this.state.loading}
+          onClick={() => (this.state.cannotSolve || this.state.loading ?
+            null : this.handleButton())}>
+          {this.state.buttonMessage}
+        </Button>
       </div>
     )
   }
