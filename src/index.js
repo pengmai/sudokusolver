@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Alert } from 'react-bootstrap';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
 import Board from './board.js';
@@ -66,9 +66,19 @@ class SudokuSolver extends React.Component {
       Client.solve(this.state.board)
         .then(response => {
           if (response.hasOwnProperty("error")) {
+            var error;
+            console.log(response.error);
+            switch (response.error) {
+              case "Contradiction detected at root.":
+                error = `There appears to be no possible solutions to the
+                  puzzle you have entered. Please update it and try again.`;
+                break;
+              default:
+                error = "An unknown error has occurred. Please try again.";
+            }
             this.setState({
               buttonMessage: "Solve",
-              error: response.error,
+              error: error,
               loading: false,
               solved: false
             });
@@ -88,6 +98,12 @@ class SudokuSolver extends React.Component {
   render() {
     return (
       <div>
+        {this.state.error === "" ? "" :
+          <Alert bsStyle="danger">
+            <p>{this.state.error}</p>
+          </Alert>
+        }
+
         <Board
           board={this.state.board}
           valid={this.state.valid}
@@ -105,7 +121,6 @@ class SudokuSolver extends React.Component {
             {this.state.buttonMessage}
           </Button>
         </div>
-        <p id="errorMessage">{this.state.error}</p>
       </div>
     )
   }
