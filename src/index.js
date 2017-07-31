@@ -15,12 +15,12 @@ class SudokuSolver extends React.Component {
 
     this.state = {
       board: rows,
-      valid: valid,
-      solved: false,
-      error: "",
+      buttonMessage: "Solve",
       cannotSolve: false,
+      error: "",
       loading: false,
-      buttonMessage: "Solve"
+      solved: false,
+      valid: valid
     };
   }
 
@@ -47,8 +47,8 @@ class SudokuSolver extends React.Component {
 
     this.setState({
       board: board,
-      valid: valid,
-      cannotSolve: cannotSolve
+      cannotSolve: cannotSolve,
+      valid: valid
     });
   }
 
@@ -58,24 +58,27 @@ class SudokuSolver extends React.Component {
       var board = this.getBoardSetTo(0);
       this.setState({
         board: board,
-        solved: false,
-        buttonMessage: "Solve"
+        buttonMessage: "Solve",
+        solved: false
       });
     } else {
-      this.setState({loading: true, buttonMessage: "Solving..."});
+      this.setState({buttonMessage: "Solving...", loading: true});
       Client.solve(this.state.board)
         .then(response => {
           if (response.hasOwnProperty("error")) {
             this.setState({
-              error: response.error
+              buttonMessage: "Solve",
+              error: response.error,
+              loading: false,
+              solved: false
             });
           } else {
             this.setState({
               board: response.solution,
-              solved: true,
+              buttonMessage: "Reset",
               error: "",
               loading: false,
-              buttonMessage: "Reset"
+              solved: true
             });
           }
         });
