@@ -19,7 +19,11 @@ function Square(props) {
   );
 }
 
-class Board extends React.Component {
+/*function Board(props) {
+  return (<div><p>Board</p></div>);
+}*/
+
+class Solver extends React.Component {
   constructor() {
     super();
     var rows = this.getBoardSetTo(0);
@@ -55,7 +59,6 @@ class Board extends React.Component {
 
     // Check for invalid numbers.
     const valid = Sudoku.checkConflicts(board);
-    console.log(valid);
     const cannotSolve = Sudoku.hasConflicts(valid);
 
     this.setState({
@@ -91,7 +94,6 @@ class Board extends React.Component {
       this.setState({loading: true, buttonMessage: "Solving..."});
       Client.solve(this.state.board)
         .then(response => {
-          console.log(response);
           if (response.hasOwnProperty("error")) {
             this.setState({
               error: response.error
@@ -218,7 +220,7 @@ class Board extends React.Component {
 
         <div className="text-center">
           <Button
-            bsStyle="primary"
+            bsStyle="info"
             bsSize="large"
             disabled={this.state.cannotSolve || this.state.loading}
             onClick={() => (this.state.cannotSolve || this.state.loading ?
@@ -232,5 +234,5 @@ class Board extends React.Component {
   }
 }
 
-ReactDOM.render(<Board />, document.getElementById('root'));
+ReactDOM.render(<Solver />, document.getElementById('root'));
 //registerServiceWorker();

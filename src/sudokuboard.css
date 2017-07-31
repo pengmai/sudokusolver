@@ -24,7 +24,7 @@
 .btn {
   position: relative;
   top: 550px;
-  width: 50%;
+  width: 343px;
 }
 
 @media only screen and (min-width: 600px) {
@@ -35,6 +35,7 @@
   }
   .btn {
     top: 650px;
+    width: 523px;
   }
 }
 
