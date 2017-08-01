@@ -10,9 +10,9 @@ import './numberselector.css';
 
 // Constants
 const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
-const BUTTON_DIAM = 50; // Diameter of the child buttons in pixels.
+const BUTTON_DIAM = 40; // Diameter of the child buttons in pixels.
 const NUM_CHILDREN = 10; // 9 options + 1 blank.
-const FLY_OUT_RADIUS = 120, // distance between source and each child button.
+const FLY_OUT_RADIUS = 65, // distance between source and each child button.
         SEPARATION_ANGLE = 36, // in degrees.
         FAN_ANGLE = (NUM_CHILDREN - 1) * SEPARATION_ANGLE, // in degrees.
         BASE_ANGLE = ((180 - FAN_ANGLE) / 2); // in degrees.
@@ -44,7 +44,27 @@ class SudokuSolver extends React.Component {
       selecting: false,
       solved: false,
       valid: valid,
+      windowWidth: '0',
+      windowHeight: '0'
     };
+
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+  }
+
+  componentDidMount() {
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions);
+  }
+
+  updateWindowDimensions() {
+    this.setState({
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    });
   }
 
   getBoardSetTo(i) {
@@ -56,7 +76,7 @@ class SudokuSolver extends React.Component {
     return rows;
   }
 
-  /*handleClick(i) {
+  handleClick(i) {
     const row = Math.floor(i / 9);
     const col = i % 9;
     const board = this.state.board.slice();
@@ -73,7 +93,7 @@ class SudokuSolver extends React.Component {
       cannotSolve: cannotSolve,
       valid: valid
     });
-  }*/
+  }
 
   openMenu(i) {
     this.setState({
@@ -124,11 +144,13 @@ class SudokuSolver extends React.Component {
   }
 
   initialButtonStyles() {
+    let x = this.state.windowWidth / 2;
+    let y = this.state.windowHeight / 2;
     return {
       width: BUTTON_DIAM,
       height: BUTTON_DIAM,
-      top: 200 - (BUTTON_DIAM / 2),
-      left: 200 - (BUTTON_DIAM / 2),
+      top: y - (BUTTON_DIAM / 2),
+      left: x - (BUTTON_DIAM / 2),
       zIndex: -1,
       boxShadow: null
     };
@@ -136,11 +158,13 @@ class SudokuSolver extends React.Component {
 
   finalButtonStyles(index) {
     let {deltaX, deltaY} = finalDeltaPositions(index);
+    let x = this.state.windowWidth / 2;
+    let y = this.state.windowHeight / 2;
     return {
       width: BUTTON_DIAM,
       height: BUTTON_DIAM,
-      top: 200 - deltaY,
-      left: 200 + deltaX,
+      top: y - deltaY,
+      left: x + deltaX,
       zIndex: 1,
       boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.2)'
     };
@@ -179,7 +203,7 @@ class SudokuSolver extends React.Component {
         <Board
           board={this.state.board}
           valid={this.state.valid}
-          onClick={(i) => this.openMenu(i)}
+          onClick={(i) => this.handleClick(i)}
           disabled={this.state.loading || this.state.solved}
         />
 
