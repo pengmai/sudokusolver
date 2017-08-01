@@ -4,8 +4,30 @@ import { Button, Alert } from 'react-bootstrap';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
 import Board from './board.js';
-import './index.css';
-//import registerServiceWorker from './registerServiceWorker';
+import registerServiceWorker from './registerServiceWorker';
+import range from 'lodash/range';
+import './numberselector.css';
+
+// Constants
+const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
+const BUTTON_DIAM = 50; // Diameter of the child buttons in pixels.
+const NUM_CHILDREN = 10; // 9 options + 1 blank.
+const FLY_OUT_RADIUS = 120, // distance between source and each child button.
+        SEPARATION_ANGLE = 36, // in degrees.
+        FAN_ANGLE = (NUM_CHILDREN - 1) * SEPARATION_ANGLE, // in degrees.
+        BASE_ANGLE = ((180 - FAN_ANGLE) / 2); // in degrees.
+
+function toRadians(degrees) {
+  return degrees * DEG_TO_RAD;
+}
+
+function finalDeltaPositions(index) {
+  let angle = BASE_ANGLE + (index * SEPARATION_ANGLE);
+  return {
+    deltaX: FLY_OUT_RADIUS * Math.cos(toRadians(angle)) - (BUTTON_DIAM / 2),
+    deltaY: FLY_OUT_RADIUS * Math.sin(toRadians(angle)) + (BUTTON_DIAM / 2)
+  };
+}
 
 class SudokuSolver extends React.Component {
   constructor() {
@@ -19,8 +41,9 @@ class SudokuSolver extends React.Component {
       cannotSolve: false,
       error: "",
       loading: false,
+      selecting: false,
       solved: false,
-      valid: valid
+      valid: valid,
     };
   }
 
@@ -33,7 +56,7 @@ class SudokuSolver extends React.Component {
     return rows;
   }
 
-  handleClick(i) {
+  /*handleClick(i) {
     const row = Math.floor(i / 9);
     const col = i % 9;
     const board = this.state.board.slice();
@@ -49,6 +72,12 @@ class SudokuSolver extends React.Component {
       board: board,
       cannotSolve: cannotSolve,
       valid: valid
+    });
+  }*/
+
+  openMenu(i) {
+    this.setState({
+      selecting: !this.state.selecting
     });
   }
 
@@ -94,9 +123,51 @@ class SudokuSolver extends React.Component {
     }
   }
 
+  initialButtonStyles() {
+    return {
+      width: BUTTON_DIAM,
+      height: BUTTON_DIAM,
+      top: 200 - (BUTTON_DIAM / 2),
+      left: 200 - (BUTTON_DIAM / 2),
+      zIndex: -1,
+      boxShadow: null
+    };
+  }
+
+  finalButtonStyles(index) {
+    let {deltaX, deltaY} = finalDeltaPositions(index);
+    return {
+      width: BUTTON_DIAM,
+      height: BUTTON_DIAM,
+      top: 200 - deltaY,
+      left: 200 + deltaX,
+      zIndex: 1,
+      boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.2)'
+    };
+  }
+
+  select(index) {
+    console.log("Index: " + index);
+    this.setState({
+      selecting: false
+    });
+  }
+
   render() {
     return (
       <div>
+        {range(NUM_CHILDREN).map(index => {
+          let style = this.state.selecting ? this.finalButtonStyles(index) : this.initialButtonStyles(index);
+          return (
+            <div
+              key={index}
+              className="child-button"
+              style={style}
+              onClick={() => this.select(index)}>
+              {index > 0 ? index : ''}
+            </div>
+          );
+        })}
         <div className="text-center">
           {this.state.error === "" ? "" :
             <Alert bsStyle="danger">
@@ -108,7 +179,7 @@ class SudokuSolver extends React.Component {
         <Board
           board={this.state.board}
           valid={this.state.valid}
-          onClick={(i) => this.handleClick(i)}
+          onClick={(i) => this.openMenu(i)}
           disabled={this.state.loading || this.state.solved}
         />
 
@@ -117,7 +188,7 @@ class SudokuSolver extends React.Component {
           bsSize="large"
           disabled={this.state.cannotSolve || this.state.loading}
           onClick={() => (this.state.cannotSolve || this.state.loading ?
-            null : this.handleButton())}>
+            null : this.openMenu(0))}>
           {this.state.buttonMessage}
         </Button>
       </div>
@@ -126,4 +197,4 @@ class SudokuSolver extends React.Component {
 }
 
 ReactDOM.render(<SudokuSolver />, document.getElementById('root'));
-//registerServiceWorker();
+registerServiceWorker();
