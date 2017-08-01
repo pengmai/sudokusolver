@@ -22,9 +22,11 @@
 }
 
 .btn {
-  position: relative;
-  top: 550px;
-  width: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(400%);
+  width: 342px;
 }
 
 @media only screen and (min-width: 600px) {
@@ -33,8 +35,10 @@
     line-height: 56px;
     width: 56px;
   }
+  
   .btn {
-    top: 650px;
+    transform: translateX(-50%) translateY(600%);
+    width: 523px;
   }
 }
 

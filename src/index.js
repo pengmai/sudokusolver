@@ -1,25 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Alert } from 'react-bootstrap';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
+import Board from './board.js';
 import './index.css';
-import './sudokuboard.css';
 //import registerServiceWorker from './registerServiceWorker';
 
-function Square(props) {
-  return (
-    <button
-        className="square"
-        onClick={props.onClick}
-        disabled={props.disabled}
-        style={{color: props.valid ? "" : "red"}}>
-      {props.value === 0 ? "" : props.value}
-    </button>
-  );
-}
-
-class Board extends React.Component {
+class SudokuSolver extends React.Component {
   constructor() {
     super();
     var rows = this.getBoardSetTo(0);
@@ -27,12 +15,12 @@ class Board extends React.Component {
 
     this.state = {
       board: rows,
-      valid: valid,
-      solved: false,
-      error: "",
+      buttonMessage: "Solve",
       cannotSolve: false,
+      error: "",
       loading: false,
-      buttonMessage: "Solve"
+      solved: false,
+      valid: valid
     };
   }
 
@@ -55,27 +43,13 @@ class Board extends React.Component {
 
     // Check for invalid numbers.
     const valid = Sudoku.checkConflicts(board);
-    console.log(valid);
     const cannotSolve = Sudoku.hasConflicts(valid);
 
     this.setState({
       board: board,
-      valid: valid,
-      cannotSolve: cannotSolve
+      cannotSolve: cannotSolve,
+      valid: valid
     });
-  }
-
-  renderSquare(i) {
-    const row = Math.floor(i / 9);
-    const col = i % 9;
-    return (
-      <Square
-        value={this.state.board[row][col]}
-        onClick={() => this.handleClick(i)}
-        valid={this.state.valid[row][col]}
-        disabled={this.state.loading || this.state.solved}
-      />
-    );
   }
 
   handleButton() {
@@ -84,25 +58,36 @@ class Board extends React.Component {
       var board = this.getBoardSetTo(0);
       this.setState({
         board: board,
-        solved: false,
-        buttonMessage: "Solve"
+        buttonMessage: "Solve",
+        solved: false
       });
     } else {
-      this.setState({loading: true, buttonMessage: "Solving..."});
+      this.setState({buttonMessage: "Solving...", loading: true});
       Client.solve(this.state.board)
         .then(response => {
-          console.log(response);
           if (response.hasOwnProperty("error")) {
+            var error;
+            switch (response.error) {
+              case "Contradiction detected at root.":
+                error = `There appears to be no possible solutions to the
+                  puzzle you have entered. Please update it and try again.`;
+                break;
+              default:
+                error = "An unknown error has occurred. Please try again.";
+            }
             this.setState({
-              error: response.error
+              buttonMessage: "Solve",
+              error: error,
+              loading: false,
+              solved: false
             });
           } else {
             this.setState({
               board: response.solution,
-              solved: true,
+              buttonMessage: "Reset",
               error: "",
               loading: false,
-              buttonMessage: "Reset"
+              solved: true
             });
           }
         });
@@ -112,125 +97,33 @@ class Board extends React.Component {
   render() {
     return (
       <div>
-        <table className="board">
-          <tbody>
-            <tr className="board-row">
-              <td>{this.renderSquare(0)}</td>
-              <td>{this.renderSquare(1)}</td>
-              <td>{this.renderSquare(2)}</td>
-              <td>{this.renderSquare(3)}</td>
-              <td>{this.renderSquare(4)}</td>
-              <td>{this.renderSquare(5)}</td>
-              <td>{this.renderSquare(6)}</td>
-              <td>{this.renderSquare(7)}</td>
-              <td>{this.renderSquare(8)}</td>
-            </tr>
-            <tr className="board-row">
-              <td>{this.renderSquare(9)}</td>
-              <td>{this.renderSquare(10)}</td>
-              <td>{this.renderSquare(11)}</td>
-              <td>{this.renderSquare(12)}</td>
-              <td>{this.renderSquare(13)}</td>
-              <td>{this.renderSquare(14)}</td>
-              <td>{this.renderSquare(15)}</td>
-              <td>{this.renderSquare(16)}</td>
-              <td>{this.renderSquare(17)}</td>
-            </tr>
-            <tr className="board-row">
-              <td>{this.renderSquare(18)}</td>
-              <td>{this.renderSquare(19)}</td>
-              <td>{this.renderSquare(20)}</td>
-              <td>{this.renderSquare(21)}</td>
-              <td>{this.renderSquare(22)}</td>
-              <td>{this.renderSquare(23)}</td>
-              <td>{this.renderSquare(24)}</td>
-              <td>{this.renderSquare(25)}</td>
-              <td>{this.renderSquare(26)}</td>
-            </tr>
-            <tr className="board-row">
-              <td>{this.renderSquare(27)}</td>
-              <td>{this.renderSquare(28)}</td>
-              <td>{this.renderSquare(29)}</td>
-              <td>{this.renderSquare(30)}</td>
-              <td>{this.renderSquare(31)}</td>
-              <td>{this.renderSquare(32)}</td>
-              <td>{this.renderSquare(33)}</td>
-              <td>{this.renderSquare(34)}</td>
-              <td>{this.renderSquare(35)}</td>
-            </tr>
-            <tr className="board-row">
-              <td>{this.renderSquare(36)}</td>
-              <td>{this.renderSquare(37)}</td>
-              <td>{this.renderSquare(38)}</td>
-              <td>{this.renderSquare(39)}</td>
-              <td>{this.renderSquare(40)}</td>
-              <td>{this.renderSquare(41)}</td>
-              <td>{this.renderSquare(42)}</td>
-              <td>{this.renderSquare(43)}</td>
-              <td>{this.renderSquare(44)}</td>
-            </tr>
-            <tr className="board-row">
-              <td>{this.renderSquare(45)}</td>
-              <td>{this.renderSquare(46)}</td>
-              <td>{this.renderSquare(47)}</td>
-              <td>{this.renderSquare(48)}</td>
-              <td>{this.renderSquare(49)}</td>
-              <td>{this.renderSquare(50)}</td>
-              <td>{this.renderSquare(51)}</td>
-              <td>{this.renderSquare(52)}</td>
-              <td>{this.renderSquare(53)}</td>
-            </tr>
-            <tr className="board-row">
-              <td>{this.renderSquare(54)}</td>
-              <td>{this.renderSquare(55)}</td>
-              <td>{this.renderSquare(56)}</td>
-              <td>{this.renderSquare(57)}</td>
-              <td>{this.renderSquare(58)}</td>
-              <td>{this.renderSquare(59)}</td>
-              <td>{this.renderSquare(60)}</td>
-              <td>{this.renderSquare(61)}</td>
-              <td>{this.renderSquare(62)}</td>
-            </tr>
-            <tr className="board-row">
-              <td>{this.renderSquare(63)}</td>
-              <td>{this.renderSquare(64)}</td>
-              <td>{this.renderSquare(65)}</td>
-              <td>{this.renderSquare(66)}</td>
-              <td>{this.renderSquare(67)}</td>
-              <td>{this.renderSquare(68)}</td>
-              <td>{this.renderSquare(69)}</td>
-              <td>{this.renderSquare(70)}</td>
-              <td>{this.renderSquare(71)}</td>
-            </tr>
-            <tr className="board-row">
-              <td>{this.renderSquare(72)}</td>
-              <td>{this.renderSquare(73)}</td>
-              <td>{this.renderSquare(74)}</td>
-              <td>{this.renderSquare(75)}</td>
-              <td>{this.renderSquare(76)}</td>
-              <td>{this.renderSquare(77)}</td>
-              <td>{this.renderSquare(78)}</td>
-              <td>{this.renderSquare(79)}</td>
-              <td>{this.renderSquare(80)}</td>
-            </tr>
-          </tbody>
-        </table>
-
         <div className="text-center">
-          <Button
-            bsStyle="primary"
-            bsSize="large"
-            disabled={this.state.cannotSolve || this.state.loading}
-            onClick={() => (this.state.cannotSolve || this.state.loading ?
-              null : this.handleButton())}>
-            {this.state.buttonMessage}
-          </Button>
+          {this.state.error === "" ? "" :
+            <Alert bsStyle="danger">
+              <p>{this.state.error}</p>
+            </Alert>
+          }
         </div>
-        <p id="errorMessage">{this.state.error}</p>
+
+        <Board
+          board={this.state.board}
+          valid={this.state.valid}
+          onClick={(i) => this.handleClick(i)}
+          disabled={this.state.loading || this.state.solved}
+        />
+
+        <Button
+          bsStyle="info"
+          bsSize="large"
+          disabled={this.state.cannotSolve || this.state.loading}
+          onClick={() => (this.state.cannotSolve || this.state.loading ?
+            null : this.handleButton())}>
+          {this.state.buttonMessage}
+        </Button>
       </div>
     )
   }
 }
 
-ReactDOM.render(<Board />, document.getElementById('root'));
+ReactDOM.render(<SudokuSolver />, document.getElementById('root'));
 //registerServiceWorker();

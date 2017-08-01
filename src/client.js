@@ -34,8 +34,6 @@ function solve(board) {
     .then(checkStatus)
     .then(parseJSON)
     .catch(err => ({error: err.response}));
-    //.then((response) => (response.solution))
-    //.catch((err) => (err.error));
 }
 
 const Client = { solve };
