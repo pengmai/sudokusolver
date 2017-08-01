@@ -9,6 +9,7 @@ import range from 'lodash/range';
 import './numberselector.css';
 
 // Constants
+const SQUARE_WIDTH = 38; // in pixels.
 const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
 const BUTTON_DIAM = 40; // Diameter of the child buttons in pixels.
 const NUM_CHILDREN = 10; // 9 options + 1 blank.
@@ -39,8 +40,10 @@ class SudokuSolver extends React.Component {
       board: rows,
       buttonMessage: "Solve",
       cannotSolve: false,
+      col: 0,
       error: "",
       loading: false,
+      row: 0,
       selecting: false,
       solved: false,
       valid: valid,
@@ -62,6 +65,8 @@ class SudokuSolver extends React.Component {
 
   updateWindowDimensions() {
     this.setState({
+      mX: window.innerWidth / 2,
+      mY: window.innerHeight / 2,
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight
     });
@@ -79,25 +84,26 @@ class SudokuSolver extends React.Component {
   handleClick(i) {
     const row = Math.floor(i / 9);
     const col = i % 9;
-    const board = this.state.board.slice();
 
-    // Update board.
-    board[row][col] < 9 ? board[row][col]++ : board[row][col] = 0;
+    this.setState({
+      col: col,
+      row: row,
+      selecting: true
+    });
+  }
+
+  updateBoard(selected) {
+    const board = this.state.board.slice();
+    board[this.state.row][this.state.col] = selected;
 
     // Check for invalid numbers.
     const valid = Sudoku.checkConflicts(board);
     const cannotSolve = Sudoku.hasConflicts(valid);
-
     this.setState({
       board: board,
       cannotSolve: cannotSolve,
+      selecting: false,
       valid: valid
-    });
-  }
-
-  openMenu(i) {
-    this.setState({
-      selecting: !this.state.selecting
     });
   }
 
@@ -144,13 +150,16 @@ class SudokuSolver extends React.Component {
   }
 
   initialButtonStyles() {
-    let x = this.state.windowWidth / 2;
-    let y = this.state.windowHeight / 2;
+    // The middle coordinates that the selection buttons should surround.
+    let mX = (this.state.windowWidth / 2)
+      + ((this.state.col - 4) * SQUARE_WIDTH);
+    let mY = (this.state.windowHeight / 2)
+      + ((this.state.row - 4) * SQUARE_WIDTH);
     return {
       width: BUTTON_DIAM,
       height: BUTTON_DIAM,
-      top: y - (BUTTON_DIAM / 2),
-      left: x - (BUTTON_DIAM / 2),
+      top: mY - (BUTTON_DIAM / 2),
+      left: mX - (BUTTON_DIAM / 2),
       zIndex: -1,
       boxShadow: null
     };
@@ -158,24 +167,27 @@ class SudokuSolver extends React.Component {
 
   finalButtonStyles(index) {
     let {deltaX, deltaY} = finalDeltaPositions(index);
-    let x = this.state.windowWidth / 2;
-    let y = this.state.windowHeight / 2;
+    // The middle coordinates that the selection buttons should surround.
+    let mX = (this.state.windowWidth / 2)
+      + ((this.state.col - 4) * SQUARE_WIDTH);
+    let mY = (this.state.windowHeight / 2)
+      + ((this.state.row - 4) * SQUARE_WIDTH);
     return {
       width: BUTTON_DIAM,
       height: BUTTON_DIAM,
-      top: y - deltaY,
-      left: x + deltaX,
+      top: mY - deltaY,
+      left: mX + deltaX,
       zIndex: 1,
       boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.2)'
     };
   }
 
-  select(index) {
-    console.log("Index: " + index);
+  /*select(index) {
     this.setState({
-      selecting: false
+      selecting: false,
+      selected: index
     });
-  }
+  }*/
 
   render() {
     return (
@@ -187,7 +199,7 @@ class SudokuSolver extends React.Component {
               key={index}
               className="child-button"
               style={style}
-              onClick={() => this.select(index)}>
+              onClick={() => this.updateBoard(index)}>
               {index > 0 ? index : ''}
             </div>
           );
@@ -212,7 +224,7 @@ class SudokuSolver extends React.Component {
           bsSize="large"
           disabled={this.state.cannotSolve || this.state.loading}
           onClick={() => (this.state.cannotSolve || this.state.loading ?
-            null : this.openMenu(0))}>
+            null : this.handleButton())}>
           {this.state.buttonMessage}
         </Button>
       </div>
