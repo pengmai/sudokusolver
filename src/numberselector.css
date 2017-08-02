@@ -1,0 +1,13 @@
+.child-button {
+	position: absolute;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 100%;
+	background-color: white;
+	font-size: 26px;
+	font-weight: bold;
+	font-family: Arial;
+	color: #ccc;
+	box-shadow: 0px 1px 3px black;
+}

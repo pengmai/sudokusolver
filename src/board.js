@@ -8,7 +8,7 @@ function Square(props) {
         onClick={props.onClick}
         disabled={props.disabled}
         style={{color: props.valid ? "" : "red"}}>
-      {props.value === 0 ? "" : props.value}
+      <span>{props.value === 0 ? "" : props.value}</span>
     </button>
   );
 }

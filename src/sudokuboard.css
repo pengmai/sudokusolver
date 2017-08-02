@@ -11,14 +11,18 @@
 .square {
   color: #ccc;
   background: white;
-  border: None;
+  border: 2px solid white;
   font-family: Arial;
   font-size: 26px;
   font-weight: bold;
-  line-height: 36px;
   height: 36px;
-  /*text-align: center;*/
+  line-height: 36px;
   width: 36px;
+}
+
+span {
+  position: relative;
+  top: -3px;
 }
 
 .btn {
@@ -29,7 +33,7 @@
   width: 342px;
 }
 
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: 600px) and (min-height: 660px) {
   .square {
     height: 56px;
     line-height: 56px;
@@ -44,6 +48,7 @@
 
 .square:focus {
   outline: none;
+  border: 2px solid #ccc;
 }
 
 td {

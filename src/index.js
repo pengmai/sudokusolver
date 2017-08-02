@@ -1,11 +1,33 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Button, Alert } from 'react-bootstrap';
+import { Motion, spring } from 'react-motion';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
 import Board from './board.js';
-import './index.css';
-//import registerServiceWorker from './registerServiceWorker';
+import registerServiceWorker from './registerServiceWorker';
+import range from 'lodash/range';
+import './numberselector.css';
+
+// Constants
+const SPRING_PARAMS = {stiffness: 170, damping: 17};
+const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
+const NUM_CHILDREN = 10; // 9 options + 1 blank.
+const SEPARATION_ANGLE = 36, // in degrees.
+        FAN_ANGLE = (NUM_CHILDREN - 1) * SEPARATION_ANGLE, // in degrees.
+        BASE_ANGLE = ((180 - FAN_ANGLE) / 2); // in degrees.
+
+function toRadians(degrees) {
+  return degrees * DEG_TO_RAD;
+}
+
+function finalDeltaPositions(index, buttonDiam, flyOutRadius) {
+  let angle = BASE_ANGLE + (index * SEPARATION_ANGLE);
+  return {
+    deltaX: flyOutRadius * Math.cos(toRadians(angle)) - (buttonDiam / 2),
+    deltaY: flyOutRadius * Math.sin(toRadians(angle)) + (buttonDiam / 2)
+  };
+}
 
 class SudokuSolver extends React.Component {
   constructor() {
@@ -17,11 +39,36 @@ class SudokuSolver extends React.Component {
       board: rows,
       buttonMessage: "Solve",
       cannotSolve: false,
+      col: 4,
       error: "",
       loading: false,
+      row: 4,
+      selecting: false,
       solved: false,
-      valid: valid
+      valid: valid,
+      windowWidth: '0',
+      windowHeight: '0'
     };
+
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+  }
+
+  componentDidMount() {
+    this.updateWindowDimensions();
+    window.addEventListener('resize', this.updateWindowDimensions);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions);
+  }
+
+  updateWindowDimensions() {
+    this.setState({
+      mX: window.innerWidth / 2,
+      mY: window.innerHeight / 2,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight
+    });
   }
 
   getBoardSetTo(i) {
@@ -36,18 +83,32 @@ class SudokuSolver extends React.Component {
   handleClick(i) {
     const row = Math.floor(i / 9);
     const col = i % 9;
-    const board = this.state.board.slice();
 
-    // Update board.
-    board[row][col] < 9 ? board[row][col]++ : board[row][col] = 0;
+    // Clicking the same square twice will dismiss the selection buttons.
+    if (row === this.state.row && col === this.state.col) {
+      this.setState({
+        selecting: !this.state.selecting
+      });
+    } else {
+      this.setState({
+        col: col,
+        row: row,
+        selecting: true
+      });
+    }
+  }
+
+  updateBoard(selected) {
+    const board = this.state.board.slice();
+    board[this.state.row][this.state.col] = selected;
 
     // Check for invalid numbers.
     const valid = Sudoku.checkConflicts(board);
     const cannotSolve = Sudoku.hasConflicts(valid);
-
     this.setState({
       board: board,
       cannotSolve: cannotSolve,
+      selecting: false,
       valid: valid
     });
   }
@@ -68,6 +129,7 @@ class SudokuSolver extends React.Component {
           if (response.hasOwnProperty("error")) {
             var error;
             switch (response.error) {
+              case "Puzzle unsolved. Has no solutions":
               case "Contradiction detected at root.":
                 error = `There appears to be no possible solutions to the
                   puzzle you have entered. Please update it and try again.`;
@@ -94,9 +156,80 @@ class SudokuSolver extends React.Component {
     }
   }
 
+  initialButtonStyles() {
+    var squareWidth, buttonDiam;
+    if (this.state.windowWidth > 600 && this.state.windowHeight > 660) {
+      squareWidth = 58;
+      buttonDiam = 40;
+    } else {
+      squareWidth = 38;
+      buttonDiam = 30;
+    }
+    // The middle coordinates that the selection buttons should surround.
+    let mX = (this.state.windowWidth / 2)
+      + ((this.state.col - 4) * squareWidth);
+    let mY = (this.state.windowHeight / 2)
+      + ((this.state.row - 4) * squareWidth);
+    return {
+      width: buttonDiam,
+      height: buttonDiam,
+      top: spring(mY - (buttonDiam / 2), SPRING_PARAMS),
+      left: spring(mX - (buttonDiam / 2), SPRING_PARAMS),
+      zIndex: spring(-1, {stiffness: 2500, damping: 50})
+    };
+  }
+
+  finalButtonStyles(index) {
+    var squareWidth, buttonDiam, flyOutRadius;
+    if (this.state.windowWidth > 600 && this.state.windowHeight > 660) {
+      squareWidth = 58;
+      buttonDiam = 40;
+      flyOutRadius = 65;
+    } else {
+      squareWidth = 38;
+      buttonDiam = 30;
+      flyOutRadius = 50;
+    }
+    let {deltaX, deltaY} = finalDeltaPositions(index, buttonDiam, flyOutRadius);
+    // The middle coordinates that the selection buttons should surround.
+    let mX = (this.state.windowWidth / 2)
+      + ((this.state.col - 4) * squareWidth);
+    let mY = (this.state.windowHeight / 2)
+      + ((this.state.row - 4) * squareWidth);
+    return {
+      width: buttonDiam,
+      height: buttonDiam,
+      top: spring(mY - deltaY, SPRING_PARAMS),
+      left: spring(mX + deltaX, SPRING_PARAMS),
+      zIndex: 1
+    };
+  }
+
   render() {
     return (
       <div>
+        {range(NUM_CHILDREN).map(index => {
+          let style = this.state.selecting ? this.finalButtonStyles(index) : this.initialButtonStyles();
+          return (
+            <Motion style={style} key={index}>
+              {({width, height, top, left, zIndex}) =>
+                <div
+                  className="child-button"
+                  style={{
+                    width: width,
+                    height: height,
+                    top: top,
+                    left: left,
+                    zIndex: zIndex
+                  }}
+                  onClick={() => {this.updateBoard(index)}}>
+                  {index > 0 ? index : ''}
+                </div>
+              }
+            </Motion>
+          );
+        })}
+
         <div className="text-center">
           {this.state.error === "" ? "" :
             <Alert bsStyle="danger">
@@ -126,4 +259,4 @@ class SudokuSolver extends React.Component {
 }
 
 ReactDOM.render(<SudokuSolver />, document.getElementById('root'));
-//registerServiceWorker();
+registerServiceWorker();
