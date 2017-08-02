@@ -48,6 +48,7 @@ span {
 
 .square:focus {
   outline: none;
+  border: 2px solid #ccc;
 }
 
 td {

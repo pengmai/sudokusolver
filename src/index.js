@@ -10,7 +10,7 @@ import range from 'lodash/range';
 import './numberselector.css';
 
 // Constants
-const SPRING_PARAMS = {stiffness: 100, damping: 10};
+const SPRING_PARAMS = {stiffness: 170, damping: 17};
 const SQUARE_WIDTH = 38; // in pixels.
 const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
 const BUTTON_DIAM = 30; // Diameter of the child buttons in pixels.
@@ -169,7 +169,7 @@ class SudokuSolver extends React.Component {
       height: BUTTON_DIAM,
       top: spring(mY - (BUTTON_DIAM / 2), SPRING_PARAMS),
       left: spring(mX - (BUTTON_DIAM / 2), SPRING_PARAMS),
-      zIndex: spring(-1, [1000000, 26])
+      zIndex: spring(-1, {stiffness: 2500, damping: 50})
     };
   }
 
