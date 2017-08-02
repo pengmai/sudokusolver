@@ -17,6 +17,7 @@ const SEPARATION_ANGLE = 36, // in degrees.
         FAN_ANGLE = (NUM_CHILDREN - 1) * SEPARATION_ANGLE, // in degrees.
         BASE_ANGLE = ((180 - FAN_ANGLE) / 2); // in degrees.
 
+// Utilities for the input animation
 function toRadians(degrees) {
   return degrees * DEG_TO_RAD;
 }
@@ -99,6 +100,7 @@ class SudokuSolver extends React.Component {
   }
 
   updateBoard(selected) {
+    console.log(this.state.windowWidth);
     const board = this.state.board.slice();
     board[this.state.row][this.state.col] = selected;
 
@@ -123,7 +125,11 @@ class SudokuSolver extends React.Component {
         solved: false
       });
     } else {
-      this.setState({buttonMessage: "Solving...", loading: true});
+      this.setState({
+        buttonMessage: "Solving...",
+        loading: true,
+        selecting: false
+      });
       Client.solve(this.state.board)
         .then(response => {
           if (response.hasOwnProperty("error")) {
@@ -170,6 +176,7 @@ class SudokuSolver extends React.Component {
       + ((this.state.col - 4) * squareWidth);
     let mY = (this.state.windowHeight / 2)
       + ((this.state.row - 4) * squareWidth);
+
     return {
       width: buttonDiam,
       height: buttonDiam,
@@ -196,6 +203,16 @@ class SudokuSolver extends React.Component {
       + ((this.state.col - 4) * squareWidth);
     let mY = (this.state.windowHeight / 2)
       + ((this.state.row - 4) * squareWidth);
+
+    // Ensure all buttons are visible, even on smallest viewports.
+    if (this.state.windowWidth < 440) {
+      if (this.state.col === 0) {
+        mX -= ((this.state.windowWidth / 2) - 220);
+      } else if (this.state.col === 8) {
+        mX += ((this.state.windowWidth / 2) - 220);
+      }
+    }
+
     return {
       width: buttonDiam,
       height: buttonDiam,
