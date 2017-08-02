@@ -11,12 +11,9 @@ import './numberselector.css';
 
 // Constants
 const SPRING_PARAMS = {stiffness: 170, damping: 17};
-const SQUARE_WIDTH = 38; // in pixels.
 const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
-const BUTTON_DIAM = 30; // Diameter of the child buttons in pixels.
 const NUM_CHILDREN = 10; // 9 options + 1 blank.
-const FLY_OUT_RADIUS = 65, // distance between source and each child button.
-        SEPARATION_ANGLE = 36, // in degrees.
+const SEPARATION_ANGLE = 36, // in degrees.
         FAN_ANGLE = (NUM_CHILDREN - 1) * SEPARATION_ANGLE, // in degrees.
         BASE_ANGLE = ((180 - FAN_ANGLE) / 2); // in degrees.
 
@@ -24,11 +21,11 @@ function toRadians(degrees) {
   return degrees * DEG_TO_RAD;
 }
 
-function finalDeltaPositions(index) {
+function finalDeltaPositions(index, buttonDiam, flyOutRadius) {
   let angle = BASE_ANGLE + (index * SEPARATION_ANGLE);
   return {
-    deltaX: FLY_OUT_RADIUS * Math.cos(toRadians(angle)) - (BUTTON_DIAM / 2),
-    deltaY: FLY_OUT_RADIUS * Math.sin(toRadians(angle)) + (BUTTON_DIAM / 2)
+    deltaX: flyOutRadius * Math.cos(toRadians(angle)) - (buttonDiam / 2),
+    deltaY: flyOutRadius * Math.sin(toRadians(angle)) + (buttonDiam / 2)
   };
 }
 
@@ -132,6 +129,7 @@ class SudokuSolver extends React.Component {
           if (response.hasOwnProperty("error")) {
             var error;
             switch (response.error) {
+              case "Puzzle unsolved. Has no solutions":
               case "Contradiction detected at root.":
                 error = `There appears to be no possible solutions to the
                   puzzle you have entered. Please update it and try again.`;
@@ -159,30 +157,48 @@ class SudokuSolver extends React.Component {
   }
 
   initialButtonStyles() {
+    var squareWidth, buttonDiam;
+    if (this.state.windowWidth > 600 && this.state.windowHeight > 660) {
+      squareWidth = 58;
+      buttonDiam = 40;
+    } else {
+      squareWidth = 38;
+      buttonDiam = 30;
+    }
     // The middle coordinates that the selection buttons should surround.
     let mX = (this.state.windowWidth / 2)
-      + ((this.state.col - 4) * SQUARE_WIDTH);
+      + ((this.state.col - 4) * squareWidth);
     let mY = (this.state.windowHeight / 2)
-      + ((this.state.row - 4) * SQUARE_WIDTH);
+      + ((this.state.row - 4) * squareWidth);
     return {
-      width: BUTTON_DIAM,
-      height: BUTTON_DIAM,
-      top: spring(mY - (BUTTON_DIAM / 2), SPRING_PARAMS),
-      left: spring(mX - (BUTTON_DIAM / 2), SPRING_PARAMS),
+      width: buttonDiam,
+      height: buttonDiam,
+      top: spring(mY - (buttonDiam / 2), SPRING_PARAMS),
+      left: spring(mX - (buttonDiam / 2), SPRING_PARAMS),
       zIndex: spring(-1, {stiffness: 2500, damping: 50})
     };
   }
 
   finalButtonStyles(index) {
-    let {deltaX, deltaY} = finalDeltaPositions(index);
+    var squareWidth, buttonDiam, flyOutRadius;
+    if (this.state.windowWidth > 600 && this.state.windowHeight > 660) {
+      squareWidth = 58;
+      buttonDiam = 40;
+      flyOutRadius = 65;
+    } else {
+      squareWidth = 38;
+      buttonDiam = 30;
+      flyOutRadius = 50;
+    }
+    let {deltaX, deltaY} = finalDeltaPositions(index, buttonDiam, flyOutRadius);
     // The middle coordinates that the selection buttons should surround.
     let mX = (this.state.windowWidth / 2)
-      + ((this.state.col - 4) * SQUARE_WIDTH);
+      + ((this.state.col - 4) * squareWidth);
     let mY = (this.state.windowHeight / 2)
-      + ((this.state.row - 4) * SQUARE_WIDTH);
+      + ((this.state.row - 4) * squareWidth);
     return {
-      width: BUTTON_DIAM,
-      height: BUTTON_DIAM,
+      width: buttonDiam,
+      height: buttonDiam,
       top: spring(mY - deltaY, SPRING_PARAMS),
       left: spring(mX + deltaX, SPRING_PARAMS),
       zIndex: 1
