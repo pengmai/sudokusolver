@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Button, Alert } from 'react-bootstrap';
+import { Motion, spring } from 'react-motion';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
 import Board from './board.js';
@@ -9,9 +10,10 @@ import range from 'lodash/range';
 import './numberselector.css';
 
 // Constants
+const SPRING_PARAMS = {stiffness: 100, damping: 10};
 const SQUARE_WIDTH = 38; // in pixels.
 const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
-const BUTTON_DIAM = 40; // Diameter of the child buttons in pixels.
+const BUTTON_DIAM = 30; // Diameter of the child buttons in pixels.
 const NUM_CHILDREN = 10; // 9 options + 1 blank.
 const FLY_OUT_RADIUS = 65, // distance between source and each child button.
         SEPARATION_ANGLE = 36, // in degrees.
@@ -40,10 +42,10 @@ class SudokuSolver extends React.Component {
       board: rows,
       buttonMessage: "Solve",
       cannotSolve: false,
-      col: 0,
+      col: 4,
       error: "",
       loading: false,
-      row: 0,
+      row: 4,
       selecting: false,
       solved: false,
       valid: valid,
@@ -85,11 +87,18 @@ class SudokuSolver extends React.Component {
     const row = Math.floor(i / 9);
     const col = i % 9;
 
-    this.setState({
-      col: col,
-      row: row,
-      selecting: true
-    });
+    // Clicking the same square twice will dismiss the selection buttons.
+    if (row === this.state.row && col === this.state.col) {
+      this.setState({
+        selecting: !this.state.selecting
+      });
+    } else {
+      this.setState({
+        col: col,
+        row: row,
+        selecting: true
+      });
+    }
   }
 
   updateBoard(selected) {
@@ -158,10 +167,9 @@ class SudokuSolver extends React.Component {
     return {
       width: BUTTON_DIAM,
       height: BUTTON_DIAM,
-      top: mY - (BUTTON_DIAM / 2),
-      left: mX - (BUTTON_DIAM / 2),
-      zIndex: -1,
-      boxShadow: null
+      top: spring(mY - (BUTTON_DIAM / 2), SPRING_PARAMS),
+      left: spring(mX - (BUTTON_DIAM / 2), SPRING_PARAMS),
+      zIndex: spring(-1, [1000000, 26])
     };
   }
 
@@ -175,35 +183,37 @@ class SudokuSolver extends React.Component {
     return {
       width: BUTTON_DIAM,
       height: BUTTON_DIAM,
-      top: mY - deltaY,
-      left: mX + deltaX,
-      zIndex: 1,
-      boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.2)'
+      top: spring(mY - deltaY, SPRING_PARAMS),
+      left: spring(mX + deltaX, SPRING_PARAMS),
+      zIndex: 1
     };
   }
-
-  /*select(index) {
-    this.setState({
-      selecting: false,
-      selected: index
-    });
-  }*/
 
   render() {
     return (
       <div>
         {range(NUM_CHILDREN).map(index => {
-          let style = this.state.selecting ? this.finalButtonStyles(index) : this.initialButtonStyles(index);
+          let style = this.state.selecting ? this.finalButtonStyles(index) : this.initialButtonStyles();
           return (
-            <div
-              key={index}
-              className="child-button"
-              style={style}
-              onClick={() => this.updateBoard(index)}>
-              {index > 0 ? index : ''}
-            </div>
+            <Motion style={style} key={index}>
+              {({width, height, top, left, zIndex}) =>
+                <div
+                  className="child-button"
+                  style={{
+                    width: width,
+                    height: height,
+                    top: top,
+                    left: left,
+                    zIndex: zIndex
+                  }}
+                  onClick={() => {this.updateBoard(index)}}>
+                  {index > 0 ? index : ''}
+                </div>
+              }
+            </Motion>
           );
         })}
+
         <div className="text-center">
           {this.state.error === "" ? "" :
             <Alert bsStyle="danger">
