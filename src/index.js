@@ -10,7 +10,7 @@ import range from 'lodash/range';
 import './numberselector.css';
 
 // Constants
-const SPRING_PARAMS = {stiffness: 170, damping: 17};
+const SPRING_PARAMS = {stiffness: 170, damping: 19};
 const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
 const NUM_CHILDREN = 10; // 9 options + 1 blank.
 const SEPARATION_ANGLE = 36, // in degrees.

@@ -18,11 +18,13 @@
   height: 36px;
   line-height: 36px;
   width: 36px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 span {
   position: relative;
-  top: -3px;
+  top: -1px;
 }
 
 .btn {
@@ -31,6 +33,13 @@ span {
   left: 50%;
   transform: translateX(-50%) translateY(400%);
   width: 342px;
+}
+
+/* Desktop screens */
+@media only screen and (min-width: 400px) {
+  .square {
+    font-size: 26px;
+  }
 }
 
 @media only screen and (min-width: 600px) and (min-height: 660px) {

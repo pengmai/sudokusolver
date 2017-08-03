@@ -3,13 +3,13 @@ import './sudokuboard.css';
 
 function Square(props) {
   return (
-    <button
+    <div
         className="square"
         onClick={props.onClick}
         disabled={props.disabled}
         style={{color: props.valid ? "" : "red"}}>
       <span>{props.value === 0 ? "" : props.value}</span>
-    </button>
+    </div>
   );
 }
 
