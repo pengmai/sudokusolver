@@ -35,13 +35,20 @@ span {
   width: 342px;
 }
 
-/* Desktop screens */
-@media only screen and (min-width: 400px) {
+/* iPhone 5 */
+@media only screen and (max-width: 320px) {
   .square {
-    font-size: 26px;
+    height: 33px;
+    width: 33px;
+    line-height: 33px;
+  }
+
+  .btn {
+    width: 315px;
   }
 }
 
+/* iPad and larger desktop screens */
 @media only screen and (min-width: 600px) and (min-height: 660px) {
   .square {
     height: 56px;

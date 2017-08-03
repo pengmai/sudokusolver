@@ -138,7 +138,7 @@ class SudokuSolver extends React.Component {
               case "Puzzle unsolved. Has no solutions":
               case "Contradiction detected at root.":
                 error = `There appears to be no possible solutions to the
-                  puzzle you have entered. Please update it and try again.`;
+                  puzzle you have entered.`;
                 break;
               default:
                 error = "An unknown error has occurred. Please try again.";
@@ -167,7 +167,12 @@ class SudokuSolver extends React.Component {
     if (this.state.windowWidth > 600 && this.state.windowHeight > 660) {
       squareWidth = 58;
       buttonDiam = 40;
+    } else if (this.state.windowWidth <= 320) {
+      // iPhone 5 and older
+      squareWidth = 35;
+      buttonDiam = 28;
     } else {
+      // Narrow desktop and iPhone 6
       squareWidth = 38;
       buttonDiam = 30;
     }
