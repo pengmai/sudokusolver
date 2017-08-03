@@ -6,8 +6,11 @@ function Square(props) {
     <div
         className="square"
         onClick={props.onClick}
-        disabled={props.disabled}
-        style={{color: props.valid ? "" : "red"}}>
+        style={{
+          color: props.valid ? "" : "red",
+          border: (props.index === props.current) && props.selecting ?
+            "3px solid #ccc" : "2px solid white"
+        }}>
       <span>{props.value === 0 ? "" : props.value}</span>
     </div>
   );
@@ -22,7 +25,9 @@ class Board extends React.Component {
         value={this.props.board[row][col]}
         onClick={() => this.props.onClick(i)}
         valid={this.props.valid[row][col]}
-        disabled={this.props.disabled}
+        index={i}
+        current={this.props.current}
+        selecting={this.props.selecting}
       />
     );
   }

@@ -82,6 +82,10 @@ class SudokuSolver extends React.Component {
   }
 
   handleClick(i) {
+    if (this.state.loading || this.state.solved) {
+      return;
+    }
+    
     const row = Math.floor(i / 9);
     const col = i % 9;
 
@@ -265,6 +269,8 @@ class SudokuSolver extends React.Component {
           valid={this.state.valid}
           onClick={(i) => this.handleClick(i)}
           disabled={this.state.loading || this.state.solved}
+          current={this.state.row * 9 + this.state.col}
+          selecting={this.state.selecting}
         />
 
         <Button
