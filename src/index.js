@@ -4,6 +4,7 @@ import {
   Button, Alert, ButtonGroup, DropdownButton, MenuItem
 } from 'react-bootstrap';
 import { Motion, spring } from 'react-motion';
+import { puzzles } from './puzzles.js';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
 import Board from './board.js';
@@ -44,7 +45,13 @@ function DropupMenu(props) {
         dropup
         title=""
         onClick={props.onClick}>
-        <MenuItem className="dropup-item" eventKey="1">Random</MenuItem>
+        <MenuItem
+          className="dropup-item"
+          eventKey="1"
+          disabled={props.loading}
+          onClick={props.random}>
+          Random
+        </MenuItem>
         <MenuItem className="dropup-item" eventKey="2">About</MenuItem>
       </DropdownButton>
     );
@@ -58,9 +65,21 @@ function DropupMenu(props) {
       dropup
       title=""
       onClick={props.onClick}>
-      <MenuItem className="dropup-item" eventKey="1">Random</MenuItem>
+      <MenuItem
+        className="dropup-item"
+        eventKey="1"
+        disabled={props.loading}
+        onClick={props.random}>
+        Random
+      </MenuItem>
       <MenuItem className="dropup-item" eventKey="2">About</MenuItem>
-      <MenuItem className="dropup-item" eventKey="3">Reset</MenuItem>
+      <MenuItem
+        className="dropup-item"
+        eventKey="3"
+        disabled={props.loading}
+        onClick={props.reset}>
+        Reset
+      </MenuItem>
     </DropdownButton>
   );
 }
@@ -153,15 +172,36 @@ class SudokuSolver extends React.Component {
     });
   }
 
+  randomPuzzle() {
+    if (this.state.loading) {
+      return;
+    }
+    let index = Math.floor(Math.random() * puzzles.length);
+    const valid = this.getBoardSetTo(1);
+    this.setState({
+      board: puzzles[index],
+      buttonMessage: "Solve",
+      cannotSolve: false,
+      solved: false,
+      valid: valid
+    });
+  }
+
+  resetBoard() {
+    if (this.state.loading) {
+      return;
+    }
+    const board = this.getBoardSetTo(0);
+    this.setState({
+      board: board,
+      buttonMessage: "Solve",
+      solved: false
+    });
+  }
+
   handleButton() {
     if (this.state.solved) {
-      // Reset the board
-      var board = this.getBoardSetTo(0);
-      this.setState({
-        board: board,
-        buttonMessage: "Solve",
-        solved: false
-      });
+      this.resetBoard();
     } else {
       this.setState({
         buttonMessage: "Solving...",
@@ -334,8 +374,11 @@ class SudokuSolver extends React.Component {
             {this.state.buttonMessage}
           </Button>
           <DropupMenu
-            solved={this.props.solved}
+            solved={this.state.solved}
             onClick={() => {this.setState({selecting: false})}}
+            reset={() => {this.resetBoard()}}
+            random={() => {this.randomPuzzle()}}
+            loading={this.state.loading}
           />
         </ButtonGroup>
       </div>
