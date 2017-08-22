@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button, Alert } from 'react-bootstrap';
+import { Button, Alert, ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import { Motion, spring } from 'react-motion';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
@@ -28,6 +28,16 @@ function finalDeltaPositions(index, buttonDiam, flyOutRadius) {
     deltaX: flyOutRadius * Math.cos(toRadians(angle)) - (buttonDiam / 2),
     deltaY: flyOutRadius * Math.sin(toRadians(angle)) + (buttonDiam / 2)
   };
+}
+
+function ResetItem(props) {
+  // Only render the Reset button if the board is not currently solved.
+  if (props.solved) {
+    return (<div></div>);
+  }
+  return (
+    <MenuItem className="dropup-item" eventKey="3">Reset</MenuItem>
+  );
 }
 
 class SudokuSolver extends React.Component {
@@ -273,14 +283,29 @@ class SudokuSolver extends React.Component {
           selecting={this.state.selecting}
         />
 
-        <Button
-          bsStyle="info"
-          bsSize="large"
-          disabled={this.state.cannotSolve || this.state.loading}
-          onClick={() => (this.state.cannotSolve || this.state.loading ?
-            null : this.handleButton())}>
-          {this.state.buttonMessage}
-        </Button>
+      <ButtonGroup id="solve-group">
+          <Button
+            bsStyle="info"
+            id="solve-button"
+            bsSize="large"
+            disabled={this.state.cannotSolve || this.state.loading}
+            onClick={() => (this.state.cannotSolve || this.state.loading ?
+              null : this.handleButton())}>
+            {this.state.buttonMessage}
+          </Button>
+          <DropdownButton
+            bsStyle="info"
+            id="dropdown-button"
+            bsSize="large"
+            pullRight
+            dropup
+            title=""
+            onClick={() => {this.setState({selecting: false})}}>
+            <MenuItem className="dropup-item" eventKey="1">Random</MenuItem>
+            <MenuItem className="dropup-item" eventKey="2">About</MenuItem>
+            <ResetItem solved={this.state.solved}/>
+          </DropdownButton>
+        </ButtonGroup>
       </div>
     )
   }
