@@ -25,12 +25,15 @@ function solve(board) {
     arr => [].concat.apply([], arr.map(
       element => Array.isArray(element) ? flatten(element) : element));
   var param = flatten(board).join("");
-  param = "\"" + param + "\"";
-  console.log(param);
   var headers = new Headers({
     "accept": "application/json"
   });
-  var init = {method: 'POST', headers: headers, mode: 'cors', body: param};
+  var init = {
+    method: 'POST',
+    headers: headers,
+    mode: 'cors',
+    body: JSON.stringify(param)
+  };
   var req = new Request('/api/v1/sudokuapi.php?request=solve/', init);
   return fetch(req)
     .then(checkStatus)
