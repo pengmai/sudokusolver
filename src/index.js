@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button, Alert, ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
+import {
+  Button, Alert, ButtonGroup, DropdownButton, MenuItem
+} from 'react-bootstrap';
 import { Motion, spring } from 'react-motion';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
@@ -182,11 +184,11 @@ class SudokuSolver extends React.Component {
       squareWidth = 58;
       buttonDiam = 40;
     } else if (this.state.windowWidth <= 320) {
-      // iPhone 5 and older
+      // iPhone 5 and older.
       squareWidth = 35;
       buttonDiam = 28;
     } else {
-      // Narrow desktop and iPhone 6
+      // Narrow desktop and iPhone 6.
       squareWidth = 38;
       buttonDiam = 30;
     }
@@ -211,7 +213,13 @@ class SudokuSolver extends React.Component {
       squareWidth = 58;
       buttonDiam = 40;
       flyOutRadius = 65;
+    } else if (this.state.windowWidth <= 320) {
+      // iPhone 5 and older.
+      squareWidth = 35;
+      buttonDiam = 28;
+      flyOutRadius = 48;
     } else {
+      // Narrow desktop and iPhone 6.
       squareWidth = 38;
       buttonDiam = 30;
       flyOutRadius = 50;
@@ -224,11 +232,19 @@ class SudokuSolver extends React.Component {
       + ((this.state.row - 4) * squareWidth);
 
     // Ensure all buttons are visible, even on smallest viewports.
-    if (this.state.windowWidth < 440) {
+    if (320 < this.state.windowWidth && this.state.windowWidth < 440) {
       if (this.state.col === 0) {
         mX -= ((this.state.windowWidth / 2) - 220);
       } else if (this.state.col === 8) {
         mX += ((this.state.windowWidth / 2) - 220);
+      }
+    } else if (this.state.windowWidth <= 320) {
+      // iPhone 5 and older.
+      if (this.state.col < 2) {
+        mX -= ((this.state.windowWidth / 2) - 203 + (this.state.col * 33));
+      } else if (this.state.col > 6) {
+        mX += ((this.state.windowWidth / 2) - 203 + (this.state.col === 8 ? 0 :
+          33));
       }
     }
 
@@ -245,7 +261,8 @@ class SudokuSolver extends React.Component {
     return (
       <div>
         {range(NUM_CHILDREN).map(index => {
-          let style = this.state.selecting ? this.finalButtonStyles(index) : this.initialButtonStyles();
+          let style = this.state.selecting ? this.finalButtonStyles(index) :
+            this.initialButtonStyles();
           return (
             <Motion style={style} key={index}>
               {({width, height, top, left, zIndex}) =>
