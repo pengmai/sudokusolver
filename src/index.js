@@ -85,7 +85,7 @@ class SudokuSolver extends React.Component {
     if (this.state.loading || this.state.solved) {
       return;
     }
-    
+
     const row = Math.floor(i / 9);
     const col = i % 9;
 
@@ -104,7 +104,6 @@ class SudokuSolver extends React.Component {
   }
 
   updateBoard(selected) {
-    console.log(this.state.windowWidth);
     const board = this.state.board.slice();
     board[this.state.row][this.state.col] = selected;
 
@@ -138,9 +137,10 @@ class SudokuSolver extends React.Component {
         .then(response => {
           if (response.hasOwnProperty("error")) {
             var error;
+            console.log(response.error);
             switch (response.error) {
-              case "Puzzle unsolved. Has no solutions":
-              case "Contradiction detected at root.":
+              case "Error: Puzzle cannot be solved.":
+              case "Solver timed out.":
                 error = `There appears to be no possible solutions to the
                   puzzle you have entered.`;
                 break;

@@ -1,7 +1,8 @@
 function checkStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.status === 200 || response.status === 422) {
     return response;
   }
+  // Unknown error.
   throwError(response);
 }
 
@@ -13,7 +14,7 @@ function throwError(response) {
   const error = new Error(`HTTP Error ${response.statusText}`);
   error.status = response.statusText;
   error.response = response;
-  //console.log(error); // eslint-disable-line no-console
+  //console.log(response); // eslint-disable-line no-console
   throw error;
 }
 
@@ -24,12 +25,13 @@ function solve(board) {
     arr => [].concat.apply([], arr.map(
       element => Array.isArray(element) ? flatten(element) : element));
   var param = flatten(board).join("");
-
+  param = "\"" + param + "\"";
+  console.log(param);
   var headers = new Headers({
     "accept": "application/json"
   });
-  var init = {method: 'POST', headers: headers, mode: 'cors'};
-  var req = new Request('/api/v1/sudokuapi.php?request=solve/' + param, init);
+  var init = {method: 'POST', headers: headers, mode: 'cors', body: param};
+  var req = new Request('/api/v1/sudokuapi.php?request=solve/', init);
   return fetch(req)
     .then(checkStatus)
     .then(parseJSON)
