@@ -32,13 +32,36 @@ function finalDeltaPositions(index, buttonDiam, flyOutRadius) {
   };
 }
 
-function ResetItem(props) {
+function DropupMenu(props) {
   // Only render the Reset button if the board is not currently solved.
   if (props.solved) {
-    return (<div></div>);
+    return (
+      <DropdownButton
+        bsStyle="info"
+        id="dropdown-button"
+        bsSize="large"
+        pullRight
+        dropup
+        title=""
+        onClick={props.onClick}>
+        <MenuItem className="dropup-item" eventKey="1">Random</MenuItem>
+        <MenuItem className="dropup-item" eventKey="2">About</MenuItem>
+      </DropdownButton>
+    );
   }
   return (
-    <MenuItem className="dropup-item" eventKey="3">Reset</MenuItem>
+    <DropdownButton
+      bsStyle="info"
+      id="dropdown-button"
+      bsSize="large"
+      pullRight
+      dropup
+      title=""
+      onClick={props.onClick}>
+      <MenuItem className="dropup-item" eventKey="1">Random</MenuItem>
+      <MenuItem className="dropup-item" eventKey="2">About</MenuItem>
+      <MenuItem className="dropup-item" eventKey="3">Reset</MenuItem>
+    </DropdownButton>
   );
 }
 
@@ -310,18 +333,10 @@ class SudokuSolver extends React.Component {
               null : this.handleButton())}>
             {this.state.buttonMessage}
           </Button>
-          <DropdownButton
-            bsStyle="info"
-            id="dropdown-button"
-            bsSize="large"
-            pullRight
-            dropup
-            title=""
-            onClick={() => {this.setState({selecting: false})}}>
-            <MenuItem className="dropup-item" eventKey="1">Random</MenuItem>
-            <MenuItem className="dropup-item" eventKey="2">About</MenuItem>
-            <ResetItem solved={this.state.solved}/>
-          </DropdownButton>
+          <DropupMenu
+            solved={this.props.solved}
+            onClick={() => {this.setState({selecting: false})}}
+          />
         </ButtonGroup>
       </div>
     )
