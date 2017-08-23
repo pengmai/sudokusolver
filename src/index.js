@@ -46,16 +46,16 @@ function DropupMenu(props) {
       onClick={props.onClick}>
       <MenuItem
         className="dropup-item"
+        eventKey="2"
+        onClick={props.about}>
+        About
+      </MenuItem>
+      <MenuItem
+        className="dropup-item"
         eventKey="1"
         disabled={props.loading}
         onClick={props.random}>
         Random
-      </MenuItem>
-      <MenuItem
-        className="dropup-item"
-        eventKey="2"
-        onClick={props.about}>
-        About
       </MenuItem>
       {props.solved ? "" : <MenuItem
         className="dropup-item"
@@ -79,7 +79,7 @@ class SudokuSolver extends React.Component {
       buttonMessage: "Solve",
       cannotSolve: false,
       col: 4,
-      alert: "",
+      alert: "Welcome! Click anywhere on the board to begin.",
       loading: false,
       row: 4,
       selecting: false,
@@ -90,6 +90,10 @@ class SudokuSolver extends React.Component {
       windowHeight: '0'
     };
 
+    this.resetBoard = this.resetBoard.bind(this);
+    this.randomPuzzle = this.randomPuzzle.bind(this);
+    this.showModal = this.showModal.bind(this);
+    this.hideModal = this.hideModal.bind(this);
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
 
@@ -371,16 +375,16 @@ class SudokuSolver extends React.Component {
           <DropupMenu
             solved={this.state.solved}
             onClick={() => {this.setState({selecting: false})}}
-            reset={() => {this.resetBoard()}}
-            random={() => {this.randomPuzzle()}}
-            about={() => this.showModal()}
+            reset={this.resetBoard}
+            random={this.randomPuzzle}
+            about={this.showModal}
             loading={this.state.loading}
           />
         </ButtonGroup>
 
         <Modal
           show={this.state.showAbout}
-          onHide={() => this.hideModal()}
+          onHide={this.hideModal}
           dialogClassName="about-modal">
           <Modal.Header>
             <Modal.Title id="contained-modal-title-lg">About</Modal.Title>
@@ -412,17 +416,16 @@ class SudokuSolver extends React.Component {
               their keyboards over mice to interact with the app. It is enabled
               by default and its usage is as follows:
             </p>
-            {/*<table>
-              <tbody>
-                <tr>
-                  <td>Arrow keys</td>
-                  <td>Navigate around the board.</td>
-                </tr>
-              </tbody>
-            </table>*/}
+            <p><strong>s</strong>: solve the current board</p>
+            <p><strong>c</strong>: clear/reset the current board</p>
+            <p><strong>r</strong>: randomly set the board to one of 30 preset
+              puzzles</p>
+            <p><strong>a</strong>: display this 'About' panel</p>
+            <p>Use arrow keys to move around and the numbers to input numbers
+              into the board.</p>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => this.hideModal()}>
+            <Button onClick={this.hideModal}>
               Close
             </Button>
           </Modal.Footer>
