@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {
-  Button, Alert, ButtonGroup, DropdownButton, MenuItem
+  Button, Alert, ButtonGroup, DropdownButton, MenuItem, Modal
 } from 'react-bootstrap';
 import { Motion, spring } from 'react-motion';
 import { puzzles } from './puzzles.js';
@@ -35,27 +35,6 @@ function finalDeltaPositions(index, buttonDiam, flyOutRadius) {
 
 function DropupMenu(props) {
   // Only render the Reset button if the board is not currently solved.
-  if (props.solved) {
-    return (
-      <DropdownButton
-        bsStyle="info"
-        id="dropdown-button"
-        bsSize="large"
-        pullRight
-        dropup
-        title=""
-        onClick={props.onClick}>
-        <MenuItem
-          className="dropup-item"
-          eventKey="1"
-          disabled={props.loading}
-          onClick={props.random}>
-          Random
-        </MenuItem>
-        <MenuItem className="dropup-item" eventKey="2">About</MenuItem>
-      </DropdownButton>
-    );
-  }
   return (
     <DropdownButton
       bsStyle="info"
@@ -72,14 +51,19 @@ function DropupMenu(props) {
         onClick={props.random}>
         Random
       </MenuItem>
-      <MenuItem className="dropup-item" eventKey="2">About</MenuItem>
       <MenuItem
+        className="dropup-item"
+        eventKey="2"
+        onClick={props.about}>
+        About
+      </MenuItem>
+      {props.solved ? "" : <MenuItem
         className="dropup-item"
         eventKey="3"
         disabled={props.loading}
         onClick={props.reset}>
         Reset
-      </MenuItem>
+      </MenuItem>}
     </DropdownButton>
   );
 }
@@ -95,10 +79,11 @@ class SudokuSolver extends React.Component {
       buttonMessage: "Solve",
       cannotSolve: false,
       col: 4,
-      error: "",
+      alert: "",
       loading: false,
       row: 4,
       selecting: false,
+      showAbout: true,
       solved: false,
       valid: valid,
       windowWidth: '0',
@@ -179,6 +164,7 @@ class SudokuSolver extends React.Component {
     let index = Math.floor(Math.random() * puzzles.length);
     const valid = this.getBoardSetTo(1);
     this.setState({
+      alert: "",
       board: puzzles[index],
       buttonMessage: "Solve",
       cannotSolve: false,
@@ -193,6 +179,7 @@ class SudokuSolver extends React.Component {
     }
     const board = this.getBoardSetTo(0);
     this.setState({
+      alert: "",
       board: board,
       buttonMessage: "Solve",
       solved: false
@@ -224,7 +211,7 @@ class SudokuSolver extends React.Component {
             }
             this.setState({
               buttonMessage: "Solve",
-              error: error,
+              alert: error,
               loading: false,
               solved: false
             });
@@ -232,7 +219,7 @@ class SudokuSolver extends React.Component {
             this.setState({
               board: response.solution,
               buttonMessage: "Reset",
-              error: "",
+              alert: "",
               loading: false,
               solved: true
             });
@@ -320,6 +307,14 @@ class SudokuSolver extends React.Component {
     };
   }
 
+  showModal() {
+    this.setState({showAbout: true});
+  }
+
+  hideModal() {
+    this.setState({showAbout: false});
+  }
+
   render() {
     return (
       <div>
@@ -347,9 +342,9 @@ class SudokuSolver extends React.Component {
         })}
 
         <div className="text-center">
-          {this.state.error === "" ? "" :
-            <Alert bsStyle="danger">
-              <p>{this.state.error}</p>
+          {this.state.alert === "" ? "" :
+            <Alert bsStyle="info">
+              <p>{this.state.alert}</p>
             </Alert>
           }
         </div>
@@ -363,7 +358,7 @@ class SudokuSolver extends React.Component {
           selecting={this.state.selecting}
         />
 
-      <ButtonGroup id="solve-group">
+        <ButtonGroup id="solve-group">
           <Button
             bsStyle="info"
             id="solve-button"
@@ -378,9 +373,60 @@ class SudokuSolver extends React.Component {
             onClick={() => {this.setState({selecting: false})}}
             reset={() => {this.resetBoard()}}
             random={() => {this.randomPuzzle()}}
+            about={() => this.showModal()}
             loading={this.state.loading}
           />
         </ButtonGroup>
+
+        <Modal
+          show={this.state.showAbout}
+          onHide={() => this.hideModal()}
+          dialogClassName="about-modal">
+          <Modal.Header>
+            <Modal.Title id="contained-modal-title-lg">About</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <h4>Sudoku Solver DEV version 0.1</h4><br/>
+            <p>Created by Jacob Mai Peng</p>
+            <p>
+              {`Thank you for checking out my sudoku solver! It uses a modified
+              version of the algorithm found `}
+              <a
+                href="https://github.com/aniketawati/Sudoku-Solver"
+                target="_blank"
+                rel="noopener noreferrer">
+                here
+              </a>
+              {` and you can view the source code for the front end of this app
+                on `}
+              <a
+                href="https://github.com/pengmai/sudokufrontend"
+                target="_blank"
+                rel="noopener noreferrer">
+                Github.
+              </a>
+            </p>
+            <h4>Accessibility Mode</h4>
+            <p>
+              Accessibility mode is designed for people who would rather use
+              their keyboards over mice to interact with the app. It is enabled
+              by default and its usage is as follows:
+            </p>
+            {/*<table>
+              <tbody>
+                <tr>
+                  <td>Arrow keys</td>
+                  <td>Navigate around the board.</td>
+                </tr>
+              </tbody>
+            </table>*/}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={() => this.hideModal()}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     )
   }
