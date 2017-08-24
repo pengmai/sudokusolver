@@ -14,7 +14,6 @@ function throwError(response) {
   const error = new Error(`HTTP Error ${response.statusText}`);
   error.status = response.statusText;
   error.response = response;
-  //console.log(response); // eslint-disable-line no-console
   throw error;
 }
 
@@ -26,7 +25,8 @@ function solve(board) {
       element => Array.isArray(element) ? flatten(element) : element));
   var param = flatten(board).join("");
   var headers = new Headers({
-    "accept": "application/json"
+    'accept': 'application/json',
+    'Authorization': 'Basic '+btoa('qauser1:123456')
   });
   var init = {
     method: 'POST',
@@ -34,7 +34,7 @@ function solve(board) {
     mode: 'cors',
     body: JSON.stringify(param)
   };
-  var req = new Request('/api/v1/sudokuapi.php?request=solve/', init);
+  var req = new Request('/api/v1/solve/', init);
   return fetch(req)
     .then(checkStatus)
     .then(parseJSON)

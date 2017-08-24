@@ -88,7 +88,6 @@ class SudokuSolver extends React.Component {
   }
 
   handleKeyDown(event) {
-    console.log(event);
     if (!this.state.accessible) {
       // Pressing any key will turn on accessibility mode.
       this.setState({
@@ -223,6 +222,7 @@ class SudokuSolver extends React.Component {
       return;
     }
 
+    let start = new Date();
     this.setState({
       buttonMessage: "Solving...",
       loading: true,
@@ -232,9 +232,8 @@ class SudokuSolver extends React.Component {
       .then(response => {
         if (response.hasOwnProperty("error")) {
           var error;
-          console.log(response.error);
           switch (response.error) {
-            case "Error: Puzzle cannot be solved.":
+            case "Puzzle cannot be solved.":
             case "Solver timed out.":
               error = `There appears to be no possible solutions to the
                 puzzle you have entered.`;
@@ -249,10 +248,11 @@ class SudokuSolver extends React.Component {
             solved: false
           });
         } else {
+          let elapsed = new Date() - start;
           this.setState({
             board: response.solution,
             buttonMessage: "Reset",
-            alert: "",
+            alert: "Solved! Time elapsed: " + elapsed + " milliseconds.",
             loading: false,
             solved: true
           });
