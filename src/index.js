@@ -33,7 +33,7 @@ function finalDeltaPositions(index, buttonDiam, flyOutRadius) {
   };
 }
 
-function DropupMenu(props) {
+function DropupMenu (props) {
   // Only render the Reset button if the board is not currently solved.
   return (
     <DropdownButton
@@ -46,26 +46,33 @@ function DropupMenu(props) {
       onClick={props.onClick}>
       <MenuItem
         className="dropup-item"
-        eventKey="2"
+        eventKey="1"
         onClick={props.about}>
         About
       </MenuItem>
       <MenuItem
         className="dropup-item"
-        eventKey="1"
+        eventKey="2"
         disabled={props.loading}
         onClick={props.random}>
-        Random
+        Random Puzzle
       </MenuItem>
-      {props.solved ? "" : <MenuItem
+      {props.accessible ? <MenuItem
         className="dropup-item"
         eventKey="3"
+        onClick={props.accessibilityOff}>
+        Turn Accessible Mode Off
+      </MenuItem> : ""}
+      {props.solved ? "" : <MenuItem
+        className="dropup-item"
+        eventKey="4"
         disabled={props.loading}
         onClick={props.reset}>
-        Reset
+        Reset Board
       </MenuItem>}
     </DropdownButton>
   );
+
 }
 
 class SudokuSolver extends React.Component {
@@ -75,6 +82,7 @@ class SudokuSolver extends React.Component {
     var valid = this.getBoardSetTo(1);
 
     this.state = {
+      accessible: false,
       board: rows,
       buttonMessage: "Solve",
       cannotSolve: false,
@@ -83,7 +91,7 @@ class SudokuSolver extends React.Component {
       loading: false,
       row: 4,
       selecting: false,
-      showAbout: true,
+      showAbout: false,
       solved: false,
       valid: valid,
       windowWidth: '0',
@@ -94,16 +102,20 @@ class SudokuSolver extends React.Component {
     this.randomPuzzle = this.randomPuzzle.bind(this);
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.accessibilityOff = this.accessibilityOff.bind(this);
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
 
   componentDidMount() {
     this.updateWindowDimensions();
     window.addEventListener('resize', this.updateWindowDimensions);
+    window.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateWindowDimensions);
+    window.removeEventListener('keydown', this.handleKeyDown);
   }
 
   updateWindowDimensions() {
@@ -113,6 +125,59 @@ class SudokuSolver extends React.Component {
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight
     });
+  }
+
+  handleKeyDown(event) {
+    console.log(event);
+    if (!this.state.accessible) {
+      // Pressing any key will turn on accessibility mode.
+      this.setState({
+        accessible: true,
+        alert: "You just turned on accessibility mode! Press 'a' for more info."
+      });
+      return;
+    }
+    if (this.state.showAbout) {
+      this.hideModal();
+      return;
+    }
+    if (!isNaN(event.key)) {
+      this.updateBoard(parseInt(event.key, 10));
+      return;
+    }
+
+    switch (event.key.toLowerCase()) {
+      case 'a':
+        this.showModal();
+        break;
+      case 'c':
+        this.resetBoard();
+        break;
+      case 'r':
+        this.randomPuzzle();
+        break;
+      case 's':
+        this.solveBoard();
+        break;
+      case 'i':
+        if (this.state.row > 0) {this.setState({row: this.state.row - 1});}
+        break;
+      case 'k':
+        if (this.state.row < 8) {this.setState({row: this.state.row + 1});}
+        break;
+      case 'j':
+        if (this.state.col > 0) {this.setState({col: this.state.col - 1});}
+        break;
+      case 'l':
+        if (this.state.col < 8) {this.setState({col: this.state.col + 1});}
+        break;
+      case 'backspace':
+        this.updateBoard(0);
+        break;
+      default:
+        // Do nothing.
+        break;
+    }
   }
 
   getBoardSetTo(i) {
@@ -168,7 +233,6 @@ class SudokuSolver extends React.Component {
     let index = Math.floor(Math.random() * puzzles.length);
     const valid = this.getBoardSetTo(1);
     this.setState({
-      alert: "",
       board: puzzles[index],
       buttonMessage: "Solve",
       cannotSolve: false,
@@ -190,45 +254,53 @@ class SudokuSolver extends React.Component {
     });
   }
 
+  solveBoard() {
+    if (this.state.solved || this.state.loading || this.state.cannotSolve) {
+      return;
+    }
+
+    this.setState({
+      buttonMessage: "Solving...",
+      loading: true,
+      selecting: false
+    });
+    Client.solve(this.state.board)
+      .then(response => {
+        if (response.hasOwnProperty("error")) {
+          var error;
+          console.log(response.error);
+          switch (response.error) {
+            case "Error: Puzzle cannot be solved.":
+            case "Solver timed out.":
+              error = `There appears to be no possible solutions to the
+                puzzle you have entered.`;
+              break;
+            default:
+              error = "An unknown error has occurred. Please try again.";
+          }
+          this.setState({
+            buttonMessage: "Solve",
+            alert: error,
+            loading: false,
+            solved: false
+          });
+        } else {
+          this.setState({
+            board: response.solution,
+            buttonMessage: "Reset",
+            alert: "",
+            loading: false,
+            solved: true
+          });
+        }
+      });
+  }
+
   handleButton() {
     if (this.state.solved) {
       this.resetBoard();
     } else {
-      this.setState({
-        buttonMessage: "Solving...",
-        loading: true,
-        selecting: false
-      });
-      Client.solve(this.state.board)
-        .then(response => {
-          if (response.hasOwnProperty("error")) {
-            var error;
-            console.log(response.error);
-            switch (response.error) {
-              case "Error: Puzzle cannot be solved.":
-              case "Solver timed out.":
-                error = `There appears to be no possible solutions to the
-                  puzzle you have entered.`;
-                break;
-              default:
-                error = "An unknown error has occurred. Please try again.";
-            }
-            this.setState({
-              buttonMessage: "Solve",
-              alert: error,
-              loading: false,
-              solved: false
-            });
-          } else {
-            this.setState({
-              board: response.solution,
-              buttonMessage: "Reset",
-              alert: "",
-              loading: false,
-              solved: true
-            });
-          }
-        });
+      this.solveBoard();
     }
   }
 
@@ -319,6 +391,14 @@ class SudokuSolver extends React.Component {
     this.setState({showAbout: false});
   }
 
+  accessibilityOff() {
+    this.setState({
+      accessible: false,
+      alert: `Accessibility mode is turned off.
+      Press any key to turn it on again.`
+    });
+  }
+
   render() {
     return (
       <div>
@@ -359,7 +439,7 @@ class SudokuSolver extends React.Component {
           onClick={(i) => this.handleClick(i)}
           disabled={this.state.loading || this.state.solved}
           current={this.state.row * 9 + this.state.col}
-          selecting={this.state.selecting}
+          selecting={this.state.selecting || this.state.accessible}
         />
 
         <ButtonGroup id="solve-group">
@@ -379,6 +459,8 @@ class SudokuSolver extends React.Component {
             random={this.randomPuzzle}
             about={this.showModal}
             loading={this.state.loading}
+            accessible={this.state.accessible}
+            accessibilityOff={this.accessibilityOff}
           />
         </ButtonGroup>
 
@@ -392,37 +474,37 @@ class SudokuSolver extends React.Component {
           <Modal.Body>
             <h4>Sudoku Solver DEV version 0.1</h4><br/>
             <p>Created by Jacob Mai Peng</p>
-            <p>
-              {`Thank you for checking out my sudoku solver! It uses a modified
-              version of the algorithm found `}
+            <p>Thank you for checking out my sudoku solver! It uses a slightly
+              modified version of the algorithm found
               <a
                 href="https://github.com/aniketawati/Sudoku-Solver"
                 target="_blank"
                 rel="noopener noreferrer">
-                here
+                {' here '}
               </a>
-              {` and you can view the source code for the front end of this app
-                on `}
+              and you can view the source code for the front end of this app on
               <a
                 href="https://github.com/pengmai/sudokufrontend"
                 target="_blank"
                 rel="noopener noreferrer">
-                Github.
+                {' Github (currently private).'}
               </a>
             </p>
             <h4>Accessibility Mode</h4>
             <p>
               Accessibility mode is designed for people who would rather use
-              their keyboards over mice to interact with the app. It is enabled
-              by default and its usage is as follows:
+              their keyboards over mice to interact with the app. It can be
+              enabled by pressing any key and its usage is as follows:
             </p>
             <p><strong>s</strong>: solve the current board</p>
             <p><strong>c</strong>: clear/reset the current board</p>
             <p><strong>r</strong>: randomly set the board to one of 30 preset
               puzzles</p>
             <p><strong>a</strong>: display this 'About' panel</p>
-            <p>Use arrow keys to move around and the numbers to input numbers
-              into the board.</p>
+            <p>Use <strong>i, j, k & l</strong> to move around and the number
+              keys to input numbers into the board. Press
+              <strong>{' backspace' }</strong> or <strong>0</strong> to
+              erase the current number.</p>
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={this.hideModal}>
