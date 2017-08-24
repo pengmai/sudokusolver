@@ -95,7 +95,11 @@ class SudokuSolver extends React.Component {
         alert: "You just turned on accessibility mode! Press 'a' for more info."
       });
       return;
+    } else if (event.key === 'Escape') {
+      // Escape will turn off accessibility mode.
+      this.accessibilityOff();
     }
+
     if (this.state.showAbout) {
       this.hideModal();
       return;
@@ -196,8 +200,9 @@ class SudokuSolver extends React.Component {
     let index = Math.floor(Math.random() * puzzles.length);
     const valid = this.getBoardSetTo(1);
     this.setState({
+      alert: 'Board set to puzzle #' + (index + 1),
       board: puzzles[index],
-      buttonMessage: "Solve",
+      buttonMessage: 'Solve',
       cannotSolve: false,
       solved: false,
       valid: valid
@@ -209,11 +214,14 @@ class SudokuSolver extends React.Component {
       return;
     }
     const board = this.getBoardSetTo(0);
+    const valid = this.getBoardSetTo(1);
     this.setState({
-      alert: "",
+      alert: "Board reset.",
       board: board,
       buttonMessage: "Solve",
-      solved: false
+      cannotSolve: false,
+      solved: false,
+      valid: valid
     });
   }
 
