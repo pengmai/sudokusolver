@@ -212,6 +212,10 @@ class SudokuSolver extends React.Component {
   }
 
   updateBoard(selected) {
+    if (this.state.solved) {
+      return;
+    }
+    
     const board = this.state.board.slice();
     board[this.state.row][this.state.col] = selected;
 
