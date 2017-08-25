@@ -42,7 +42,7 @@ class SudokuSolver extends React.Component {
     var valid = this.getBoardSetTo(1);
 
     this.state = {
-      accessible: false,
+      keyboardOn: false,
       board: rows,
       buttonMessage: "Solve",
       cannotSolve: false,
@@ -63,7 +63,7 @@ class SudokuSolver extends React.Component {
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.accessibilityOff = this.accessibilityOff.bind(this);
+    this.keyboardOff = this.keyboardOff.bind(this);
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
 
@@ -88,16 +88,16 @@ class SudokuSolver extends React.Component {
   }
 
   handleKeyDown(event) {
-    if (!this.state.accessible) {
-      // Pressing any key will turn on accessibility mode.
+    if (!this.state.keyboardOn) {
+      // Pressing any key will turn on keyboard mode.
       this.setState({
-        accessible: true,
-        alert: "You just turned on accessibility mode! Press 'a' for more info."
+        keyboardOn: true,
+        alert: "You just turned on keyboard mode! Press 'a' for more info."
       });
       return;
     } else if (event.key === 'Escape') {
-      // Escape will turn off accessibility mode.
-      this.accessibilityOff();
+      // Escape will turn off keyboard mode.
+      this.keyboardOff();
     }
 
     if (this.state.showAbout) {
@@ -363,10 +363,10 @@ class SudokuSolver extends React.Component {
     this.setState({showAbout: false});
   }
 
-  accessibilityOff() {
+  keyboardOff() {
     this.setState({
-      accessible: false,
-      alert: `Accessibility mode is turned off.
+      keyboardOn: false,
+      alert: `Keyboard mode is turned off.
       Press any key to turn it on again.`
     });
   }
@@ -411,7 +411,7 @@ class SudokuSolver extends React.Component {
           onClick={(i) => this.handleClick(i)}
           disabled={this.state.loading || this.state.solved}
           current={this.state.row * 9 + this.state.col}
-          selecting={this.state.selecting || this.state.accessible}
+          selecting={this.state.selecting || this.state.keyboardOn}
         />
 
         <ButtonGroup id="solve-group">
@@ -431,8 +431,8 @@ class SudokuSolver extends React.Component {
             random={this.randomPuzzle}
             about={this.showModal}
             loading={this.state.loading}
-            accessible={this.state.accessible}
-            accessibilityOff={this.accessibilityOff}
+            keyboardOn={this.state.keyboardOn}
+            keyboardOff={this.keyboardOff}
           />
         </ButtonGroup>
 

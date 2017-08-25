@@ -25,11 +25,11 @@ export function DropupMenu (props) {
         onClick={props.random}>
         Random Puzzle
       </MenuItem>
-      {props.accessible ? <MenuItem
+      {props.keyboardOn ? <MenuItem
         className="dropup-item"
         eventKey="3"
-        onClick={props.accessibilityOff}>
-        Turn Accessibility Mode Off
+        onClick={props.keyboardOff}>
+        Turn Keyboard Mode Off
       </MenuItem> : ""}
       {props.solved ? "" : <MenuItem
         className="dropup-item"

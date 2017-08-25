@@ -30,13 +30,13 @@ export function AboutModal(props) {
           </a>
         </p>
         <br/>
-        <h4>Accessibility Mode</h4>
+        <h4>Keyboard Mode</h4>
         <p>
-          Accessibility mode is designed for people who would rather use
+          Keyboard mode is designed for people who would rather use
           their keyboards to interact with the app. It can be enabled by
           pressing any key and its usage is as follows:
         </p>
-        <p><strong>esc</strong>: exit accessibility mode</p>
+        <p><strong>esc</strong>: exit keyboard mode</p>
         <p><strong>s</strong>: solve the current board</p>
         <p><strong>c</strong>: clear/reset the current board</p>
         <p><strong>r</strong>: randomly set the board to one of 30 preset
@@ -53,7 +53,7 @@ export function AboutModal(props) {
           has no solution. Note that this timeout occurs on the server side, so
           you will occasionally see 'time elapsed' values of greater than 5
           seconds because the timeout does not factor in the time to communicate
-          with the server. The algorithm it uses is quite efficient at finding
+          with the server. The algorithm used is quite efficient at finding
           solutions for puzzles that have at least one solution, but not very
           efficient for determining that a puzzle has no solutions. The only
           times where I've personally seen it take more than about 2 seconds on
