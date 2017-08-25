@@ -7,11 +7,11 @@ export function AboutModal(props) {
       show={props.showAbout}
       onHide={props.hideModal}
       dialogClassName="about-modal">
-      <Modal.Header>
+      <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-lg">About</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <h4>Sudoku Solver DEV version 0.1</h4><br/>
+        <h4>Sudoku Solver QA version 0.1</h4><br/>
         <p>Created by Jacob Mai Peng</p>
         <p>Thank you for checking out my sudoku solver! It uses a slightly
           modified version of the algorithm found
@@ -50,7 +50,10 @@ export function AboutModal(props) {
         <h4>Your solver says my puzzle has no solution, but it does!</h4>
         <p>This is certainly possible. The solver will time out after
           executing for 5 seconds, at which point it assumes that the puzzle
-          has no solution. The algorithm it uses is quite efficient at finding
+          has no solution. Note that this timeout occurs on the server side, so
+          you will occasionally see 'time elapsed' values of greater than 5
+          seconds because the timeout does not factor in the time to communicate
+          with the server. The algorithm it uses is quite efficient at finding
           solutions for puzzles that have at least one solution, but not very
           efficient for determining that a puzzle has no solutions. The only
           times where I've personally seen it take more than about 2 seconds on
