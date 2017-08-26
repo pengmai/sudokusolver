@@ -80,9 +80,13 @@ class SudokuSolver extends React.Component {
 
   updateWindowDimensions() {
     this.setState({
-      mX: window.innerWidth / 2,
-      mY: window.innerHeight / 2,
-      windowWidth: window.innerWidth,
+      windowWidth: Math.max(
+        document.documentElement['clientWidth'],
+        document.body['scrollWidth'],
+        document.documentElement['scrollWidth'],
+        document.body['offsetWidth'],
+        document.documentElement['offsetWidth']
+      ),
       windowHeight: window.innerHeight
     });
   }
