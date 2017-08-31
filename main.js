@@ -154,7 +154,8 @@ export default class SudokuSolver extends Component {
   }
 
   getBoardSetTo(i) {
-    for (let j = 0, var row = []; j < 9; ++j) row[j] = i;
+    let row = [];
+    for (let j = 0; j < 9; ++j) row[j] = i;
     let rows = [];
     for (let k = 0; k < 9; k++) {
       rows.push(row.slice());
