@@ -34,7 +34,7 @@ function solve(board) {
     mode: 'cors',
     body: JSON.stringify(param)
   };
-  var req = new Request('/api/v1/sudokuapi.php?request=solve', init);
+  var req = new Request('/api/v1/solve/', init);
   return fetch(req)
     .then(checkStatus)
     .then(parseJSON)
