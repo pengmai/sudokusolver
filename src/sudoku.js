@@ -42,7 +42,8 @@ function findDuplicates(arr) {
 
 function checkConflicts(board) {
   // Initialize valid to a 9x9 row of 1's
-  var line = Array(9).fill(1);
+  var line = [];
+  for (let i = 0; i < 9; ++i) line[i] = 1;
   var valid = [];
   var i, j, duplicates;
   for (i = 0; i < 9; i++) {
