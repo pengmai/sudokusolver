@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React, { Component } from 'react';
 import {
   Button, Alert, ButtonGroup
 } from 'react-bootstrap';
@@ -10,7 +9,6 @@ import { DropupMenu } from './dropupMenu.js';
 import Client from './client.js';
 import Sudoku from './sudoku.js';
 import Board from './board.js';
-import registerServiceWorker from './registerServiceWorker';
 import range from 'lodash/range';
 import './numberselector.css';
 
@@ -35,7 +33,7 @@ function finalDeltaPositions(index, buttonDiam, flyOutRadius) {
   };
 }
 
-class SudokuSolver extends React.Component {
+export default class SudokuSolver extends Component {
   constructor() {
     super();
     var rows = this.getBoardSetTo(0);
@@ -456,6 +454,3 @@ class SudokuSolver extends React.Component {
     );
   }
 }
-
-ReactDOM.render(<SudokuSolver />, document.getElementById('root'));
-registerServiceWorker();

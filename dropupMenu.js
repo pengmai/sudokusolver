@@ -1,5 +1,6 @@
 import React from 'react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 export function DropupMenu (props) {
   // Only render the Reset button if the board is not currently solved.
@@ -25,15 +26,20 @@ export function DropupMenu (props) {
         onClick={props.random}>
         Random Puzzle
       </MenuItem>
+      <LinkContainer className="dropup-item" exact to='/code'>
+        <MenuItem eventKey="3">
+          Back to Site
+        </MenuItem>
+      </LinkContainer>
       {props.keyboardOn ? <MenuItem
         className="dropup-item"
-        eventKey="3"
+        eventKey="4"
         onClick={props.keyboardOff}>
         Turn Keyboard Mode Off
       </MenuItem> : ""}
       {props.solved ? "" : <MenuItem
         className="dropup-item"
-        eventKey="4"
+        eventKey="5"
         disabled={props.loading}
         onClick={props.reset}>
         Reset Board
