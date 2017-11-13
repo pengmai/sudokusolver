@@ -59,7 +59,7 @@ export function AboutModal(props) {
           times where I've personally seen it take more than about 2 seconds on
           a puzzle are for puzzles with no solution, so if you discover a puzzle
           with a unique solution that causes the solver to time out, let me know
-          at <span style={{color: '#4686f4'}}>jacob.peng@hotmail.com</span>.
+          at <strong>jacobmpeng@gmail.com</strong>.
         </p>
       </Modal.Body>
       <Modal.Footer>
