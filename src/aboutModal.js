@@ -11,7 +11,7 @@ export function AboutModal(props) {
         <Modal.Title id="contained-modal-title-lg">About</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <h4>Sudoku Solver QA version 0.1</h4><br/>
+        <h4>Sudoku Solver QA version 0.2</h4><br/>
         <p>Created by Jacob Mai Peng</p>
         <p>Thank you for checking out my sudoku solver! It uses a slightly
           modified version of the algorithm found
@@ -59,7 +59,7 @@ export function AboutModal(props) {
           times where I've personally seen it take more than about 2 seconds on
           a puzzle are for puzzles with no solution, so if you discover a puzzle
           with a unique solution that causes the solver to time out, let me know
-          at <span style={{color: '#4686f4'}}>jacob.peng@hotmail.com</span>.
+          at <strong>jacobmpeng@gmail.com</strong>.
         </p>
       </Modal.Body>
       <Modal.Footer>
