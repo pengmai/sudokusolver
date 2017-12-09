@@ -105,15 +105,11 @@ export default class SudokuSolver extends Component {
         alert: "You just turned on keyboard mode! Press 'a' for more info."
       });
       return;
-    } else if (event.key === 'Escape') {
+  } else if (!this.state.showAbout && event.key === 'Escape') {
       // Escape will turn off keyboard mode.
       this.keyboardOff();
     }
 
-    if (this.state.showAbout) {
-      this.hideModal();
-      return;
-    }
     if (!isNaN(event.key) && event.key !== ' ') {
       this.updateBoard(parseInt(event.key, 10));
       return;
