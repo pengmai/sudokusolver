@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -36,8 +37,8 @@ export function DropupMenu (props) {
         eventKey="4"
         onClick={props.keyboardOff}>
         Turn Keyboard Mode Off
-      </MenuItem> : ""}
-      {props.solved ? "" : <MenuItem
+      </MenuItem> : ''}
+      {props.solved ? '' : <MenuItem
         className="dropup-item"
         eventKey="5"
         disabled={props.loading}
@@ -47,3 +48,14 @@ export function DropupMenu (props) {
     </DropdownButton>
   );
 }
+
+DropupMenu.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  about: PropTypes.func.isRequired,
+  random: PropTypes.func.isRequired,
+  keyboardOff: PropTypes.func.isRequired,
+  reset: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
+  keyboardOn: PropTypes.bool.isRequired,
+  solved: PropTypes.bool.isRequired
+};

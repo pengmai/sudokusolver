@@ -17,8 +17,8 @@ const SPRING_PARAMS = {stiffness: 170, damping: 19};
 const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
 const NUM_CHILDREN = 10; // 9 options + 1 blank.
 const SEPARATION_ANGLE = 36, // in degrees.
-        FAN_ANGLE = (NUM_CHILDREN - 1) * SEPARATION_ANGLE, // in degrees.
-        BASE_ANGLE = ((180 - FAN_ANGLE) / 2); // in degrees.
+  FAN_ANGLE = (NUM_CHILDREN - 1) * SEPARATION_ANGLE, // in degrees.
+  BASE_ANGLE = ((180 - FAN_ANGLE) / 2); // in degrees.
 
 // Utilities for the input animation
 function toRadians(degrees) {
@@ -42,10 +42,10 @@ export default class SudokuSolver extends Component {
     this.state = {
       keyboardOn: false,
       board: rows,
-      buttonMessage: "Solve",
+      buttonMessage: 'Solve',
       cannotSolve: false,
       col: 4,
-      alert: "Welcome! Click anywhere on the board to begin.",
+      alert: 'Welcome! Click anywhere on the board to begin.',
       loading: false,
       row: 4,
       selecting: false,
@@ -78,18 +78,18 @@ export default class SudokuSolver extends Component {
 
   updateWindowDimensions() {
     let jQueryWidth = Math.max(
-      document.documentElement["clientWidth"],
-      document.body["scrollWidth"],
-      document.documentElement["scrollWidth"],
-      document.body["offsetWidth"],
-      document.documentElement["offsetWidth"]
+      document.documentElement['clientWidth'],
+      document.body['scrollWidth'],
+      document.documentElement['scrollWidth'],
+      document.body['offsetWidth'],
+      document.documentElement['offsetWidth']
     );
     let jQueryHeight = Math.max(
-      document.documentElement["clientHeight"],
-      document.body["scrollHeight"],
-      document.documentElement["scrollHeight"],
-      document.body["offsetHeight"],
-      document.documentElement["offsetHeight"]
+      document.documentElement['clientHeight'],
+      document.body['scrollHeight'],
+      document.documentElement['scrollHeight'],
+      document.body['offsetHeight'],
+      document.documentElement['offsetHeight']
     );
     this.setState({
       windowWidth: window.innerWidth > jQueryWidth ? jQueryWidth : window.innerWidth,
@@ -102,10 +102,10 @@ export default class SudokuSolver extends Component {
       // Pressing any key will turn on keyboard mode.
       this.setState({
         keyboardOn: true,
-        alert: "You just turned on keyboard mode! Press 'a' for more info."
+        alert: 'You just turned on keyboard mode! Press \'a\' for more info.'
       });
       return;
-  } else if (!this.state.showAbout && event.key === 'Escape') {
+    } else if (!this.state.showAbout && event.key === 'Escape') {
       // Escape will turn off keyboard mode.
       this.keyboardOff();
     }
@@ -116,36 +116,36 @@ export default class SudokuSolver extends Component {
     }
 
     switch (event.key.toLowerCase()) {
-      case 'a':
-        this.showModal();
-        break;
-      case 'c':
-        this.resetBoard();
-        break;
-      case 'r':
-        this.randomPuzzle();
-        break;
-      case 's':
-        this.solveBoard();
-        break;
-      case 'i':
-        if (this.state.row > 0) {this.setState({row: this.state.row - 1});}
-        break;
-      case 'k':
-        if (this.state.row < 8) {this.setState({row: this.state.row + 1});}
-        break;
-      case 'j':
-        if (this.state.col > 0) {this.setState({col: this.state.col - 1});}
-        break;
-      case 'l':
-        if (this.state.col < 8) {this.setState({col: this.state.col + 1});}
-        break;
-      case 'backspace':
-        this.updateBoard(0);
-        break;
-      default:
-        // Do nothing.
-        break;
+    case 'a':
+      this.showModal();
+      break;
+    case 'c':
+      this.resetBoard();
+      break;
+    case 'r':
+      this.randomPuzzle();
+      break;
+    case 's':
+      this.solveBoard();
+      break;
+    case 'i':
+      if (this.state.row > 0) {this.setState({row: this.state.row - 1});}
+      break;
+    case 'k':
+      if (this.state.row < 8) {this.setState({row: this.state.row + 1});}
+      break;
+    case 'j':
+      if (this.state.col > 0) {this.setState({col: this.state.col - 1});}
+      break;
+    case 'l':
+      if (this.state.col < 8) {this.setState({col: this.state.col + 1});}
+      break;
+    case 'backspace':
+      this.updateBoard(0);
+      break;
+    default:
+      // Do nothing.
+      break;
     }
   }
 
@@ -223,9 +223,9 @@ export default class SudokuSolver extends Component {
     const board = this.getBoardSetTo(0);
     const valid = this.getBoardSetTo(1);
     this.setState({
-      alert: "Board reset.",
+      alert: 'Board reset.',
       board: board,
-      buttonMessage: "Solve",
+      buttonMessage: 'Solve',
       cannotSolve: false,
       solved: false,
       valid: valid
@@ -239,25 +239,25 @@ export default class SudokuSolver extends Component {
 
     let start = new Date();
     this.setState({
-      buttonMessage: "Solving...",
+      buttonMessage: 'Solving...',
       loading: true,
       selecting: false
     });
     Client.solve(this.state.board)
       .then(response => {
-        if (response.hasOwnProperty("error")) {
+        if (response.hasOwnProperty('error')) {
           var error;
           switch (response.error) {
-            case "Puzzle cannot be solved.":
-            case "Solver timed out.":
-              error = `There appears to be no possible solutions to the
-                puzzle you have entered.`;
-              break;
-            default:
-              error = "An unknown error has occurred. Please try again.";
+          case 'Puzzle cannot be solved.':
+          case 'Solver timed out.':
+            error = `There appears to be no possible solutions to the
+              puzzle you have entered.`;
+            break;
+          default:
+            error = 'An unknown error has occurred. Please try again.';
           }
           this.setState({
-            buttonMessage: "Solve",
+            buttonMessage: 'Solve',
             alert: error,
             loading: false,
             solved: false
@@ -266,8 +266,8 @@ export default class SudokuSolver extends Component {
           let elapsed = new Date() - start;
           this.setState({
             board: response.solution,
-            buttonMessage: "Reset",
-            alert: "Solved! Time elapsed: " + elapsed + " milliseconds.",
+            buttonMessage: 'Reset',
+            alert: `Solved! Time elapsed: ${elapsed} milliseconds`,
             loading: false,
             solved: true
           });
@@ -396,7 +396,7 @@ export default class SudokuSolver extends Component {
                     left: left,
                     zIndex: zIndex
                   }}
-                  onClick={() => {this.updateBoard(index)}}>
+                  onClick={() => this.updateBoard(index)}>
                   {index > 0 ? index : ''}
                 </div>
               }
@@ -405,7 +405,7 @@ export default class SudokuSolver extends Component {
         })}
 
         <div className="text-center">
-          {this.state.alert === "" ? "" :
+          {this.state.alert === '' ? '' :
             <Alert bsStyle="info">
               <p>{this.state.alert}</p>
             </Alert>
@@ -433,7 +433,7 @@ export default class SudokuSolver extends Component {
           </Button>
           <DropupMenu
             solved={this.state.solved}
-            onClick={() => {this.setState({selecting: false})}}
+            onClick={() => this.setState({selecting: false})}
             reset={this.resetBoard}
             random={this.randomPuzzle}
             about={this.showModal}

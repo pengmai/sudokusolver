@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Button } from 'react-bootstrap';
 
 export function AboutModal(props) {
@@ -41,7 +42,7 @@ export function AboutModal(props) {
         <p><strong>c</strong>: clear/reset the current board</p>
         <p><strong>r</strong>: randomly set the board to one of 30 preset
           puzzles</p>
-        <p><strong>a</strong>: display this 'About' panel</p>
+        <p><strong>a</strong>: display this &apos;About&apos; panel</p>
         <p>Use <strong>i, j, k, & l</strong> to move around and the number
           keys to input numbers into the board. Press
           <strong>{' backspace' }</strong> or <strong>0</strong> to
@@ -51,15 +52,15 @@ export function AboutModal(props) {
         <p>This is certainly possible. The solver will time out after
           executing for 5 seconds, at which point it assumes that the puzzle
           has no solution. Note that this timeout occurs on the server side, so
-          you will occasionally see 'time elapsed' values of greater than 5
-          seconds because the timeout does not factor in the time to communicate
-          with the server. The algorithm used is quite efficient at finding
-          solutions for puzzles that have at least one solution, but not very
-          efficient for determining that a puzzle has no solutions. The only
-          times where I've personally seen it take more than about 2 seconds on
-          a puzzle are for puzzles with no solution, so if you discover a puzzle
-          with a unique solution that causes the solver to time out, let me know
-          at <strong>jacobmpeng@gmail.com</strong>.
+          you will occasionally see &apos;time elapsed&apos; values of greater
+          than 5 seconds because the timeout does not factor in the time to
+          communicate with the server. The algorithm used is quite efficient at
+          finding solutions for puzzles that have at least one solution, but not
+          very efficient for determining that a puzzle has no solutions. The
+          only times where I&apos;ve personally seen it take more than about 2
+          seconds on a puzzle are for puzzles with no solution, so if you
+          discover a puzzle with a unique solution that causes the solver to
+          time out, let me know at <strong>jacobmpeng@gmail.com</strong>.
         </p>
       </Modal.Body>
       <Modal.Footer>
@@ -70,3 +71,8 @@ export function AboutModal(props) {
     </Modal>
   );
 }
+
+AboutModal.propTypes = {
+  showAbout: PropTypes.bool.isRequired,
+  hideModal: PropTypes.func.isRequired
+};

@@ -23,7 +23,7 @@ function solve(board) {
   let flatten =
     arr => [].concat.apply([], arr.map(
       element => Array.isArray(element) ? flatten(element) : element));
-  var param = flatten(board).join("");
+  var param = flatten(board).join('');
   var headers = new Headers({
     'accept': 'application/json',
     'Authorization': 'Basic '+btoa('qauser1:123456')

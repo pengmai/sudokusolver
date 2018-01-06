@@ -1,17 +1,17 @@
 function transposeArray(arr) {
-    var newArray = [];
-    var i, j;
-    for (i = 0; i < arr.length; i++) {
-        newArray.push([]);
-    };
+  var newArray = [];
+  var i, j;
+  for (i = 0; i < arr.length; i++) {
+    newArray.push([]);
+  }
 
-    for (i = 0; i < arr.length; i++) {
-        for (j = 0; j < arr.length; j++) {
-            newArray[j].push(arr[i][j]);
-        };
-    };
+  for (i = 0; i < arr.length; i++) {
+    for (j = 0; j < arr.length; j++) {
+      newArray[j].push(arr[i][j]);
+    }
+  }
 
-    return newArray;
+  return newArray;
 }
 
 /**
@@ -43,7 +43,7 @@ function findDuplicates(arr) {
 function checkConflicts(board) {
   // Initialize valid to a 9x9 row of 1's
   var line = [];
-  for (let i = 0; i < 9; ++i) line[i] = 1;
+  for (let i = 0; i < 9; i++) line[i] = 1;
   var valid = [];
   var i, j, duplicates;
   for (i = 0; i < 9; i++) {
@@ -103,6 +103,6 @@ function hasConflicts(valid) {
 const Sudoku = {
   checkConflicts,
   hasConflicts
-}
+};
 
 export default Sudoku;

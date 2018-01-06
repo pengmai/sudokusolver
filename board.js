@@ -1,22 +1,40 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './sudokuboard.css';
 
 function Square(props) {
   return (
     <div
-        className="square"
-        onClick={props.onClick}
-        style={{
-          color: props.valid ? "" : "red",
-          border: (props.index === props.current) && props.selecting ?
-            "3px solid #ccc" : "2px solid white"
-        }}>
-      <span>{props.value === 0 ? "" : props.value}</span>
+      className="square"
+      onClick={props.onClick}
+      style={{
+        color: props.valid ? '' : 'red',
+        border: (props.index === props.current) && props.selecting ?
+          '3px solid #ccc' : '2px solid white'
+      }}>
+      <span>{props.value === 0 ? '' : props.value}</span>
     </div>
   );
 }
 
+Square.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  valid: PropTypes.oneOf([0, 1]).isRequired,
+  index: PropTypes.number.isRequired,
+  current: PropTypes.number.isRequired,
+  selecting: PropTypes.bool.isRequired,
+  value: PropTypes.number.isRequired
+};
+
 class Board extends React.Component {
+  static propTypes = {
+    board: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+    valid: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+    onClick: PropTypes.func.isRequired,
+    current: PropTypes.number.isRequired,
+    selecting: PropTypes.bool.isRequired
+  }
+
   renderSquare(i) {
     const row = Math.floor(i / 9);
     const col = i % 9;
