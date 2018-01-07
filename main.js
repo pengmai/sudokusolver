@@ -51,6 +51,7 @@ export default class SudokuSolver extends Component {
       selecting: false,
       showAbout: false,
       solved: false,
+      token: Client.newCancelToken(),
       valid: valid,
       windowWidth: '0',
       windowHeight: '0'
@@ -74,6 +75,7 @@ export default class SudokuSolver extends Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateWindowDimensions);
     window.removeEventListener('keydown', this.handleKeyDown);
+    Client.cancel(this.state.token);
   }
 
   updateWindowDimensions() {
@@ -243,35 +245,35 @@ export default class SudokuSolver extends Component {
       loading: true,
       selecting: false
     });
-    Client.solve(this.state.board)
+    Client.solve(this.state.board, this.state.token)
       .then(response => {
-        if (response.hasOwnProperty('error')) {
-          var error;
-          switch (response.error) {
-          case 'Puzzle cannot be solved.':
-          case 'Solver timed out.':
-            error = `There appears to be no possible solutions to the
-              puzzle you have entered.`;
-            break;
-          default:
-            error = 'An unknown error has occurred. Please try again.';
-          }
-          this.setState({
-            buttonMessage: 'Solve',
-            alert: error,
-            loading: false,
-            solved: false
-          });
-        } else {
-          let elapsed = new Date() - start;
-          this.setState({
-            board: response.solution,
-            buttonMessage: 'Reset',
-            alert: `Solved! Time elapsed: ${elapsed} milliseconds`,
-            loading: false,
-            solved: true
-          });
+        let elapsed = new Date() - start;
+        this.setState({
+          board: response.solution,
+          buttonMessage: 'Reset',
+          alert: `Solved! Time elapsed: ${elapsed} milliseconds`,
+          loading: false,
+          solved: true
+        });
+      }).catch(err => {
+        if (Client.isCancelled(err)) {
+          // The component was unmounted, do nothing.
+          return;
         }
+
+        let error = '';
+        if (err.hasOwnProperty('response') && err.response.status === 422) {
+          error = `There appear to be no possible solutions to the puzzle you
+            have entered.`;
+        } else {
+          error = 'An unknown error has occurred. Please try again.';
+        }
+        this.setState({
+          buttonMessage: 'Solve',
+          alert: error,
+          loading: false,
+          solved: false
+        });
       });
   }
 

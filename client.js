@@ -1,45 +1,38 @@
-function checkStatus(response) {
-  if (response.status === 200 || response.status === 422) {
-    return response;
-  }
-  // Unknown error.
-  throwError(response);
+import axios from 'axios';
+
+function newCancelToken() {
+  return axios.CancelToken.source();
 }
 
-function parseJSON(response) {
-  return response.json();
+function cancel(token) {
+  token.cancel('Operation cancelled by user');
 }
 
-function throwError(response) {
-  const error = new Error(`HTTP Error ${response.statusText}`);
-  error.status = response.statusText;
-  error.response = response;
-  throw error;
+function isCancelled(error) {
+  return axios.isCancel(error);
 }
 
-function solve(board) {
+function solve(board, token) {
   // ES6 function to flatten a multi-dimensional array. Credit:
   // https://gist.github.com/Nishchit14/4c6a7349b3c778f7f97b912629a9f228
-  let flatten =
+  const flatten =
     arr => [].concat.apply([], arr.map(
       element => Array.isArray(element) ? flatten(element) : element));
-  var param = flatten(board).join('');
-  var headers = new Headers({
-    'accept': 'application/json',
-    'Authorization': 'Basic '+btoa('qauser1:123456')
-  });
-  var init = {
+  const param = flatten(board).join('');
+
+  var config = {
     method: 'POST',
-    headers: headers,
-    mode: 'cors',
-    body: JSON.stringify(param)
+    url: '/api/v1/sudokuapi.php?request=solve',
+    headers: {
+      'accept': 'application/json',
+      'Authorization': 'Basic '+btoa('qauser1:123456')
+    },
+    data: JSON.stringify(param),
+    cancelToken: token.token
   };
-  var req = new Request('/api/v1/sudokuapi.php?request=solve', init);
-  return fetch(req)
-    .then(checkStatus)
-    .then(parseJSON)
-    .catch(err => ({error: err.response}));
+
+  return axios(config).then(response => response.data);
 }
 
-const Client = { solve };
+const Client = { newCancelToken, cancel, isCancelled, solve };
 export default Client;
