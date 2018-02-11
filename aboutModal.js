@@ -12,7 +12,7 @@ export function AboutModal(props) {
         <Modal.Title id="contained-modal-title-lg">About</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <h4>Sudoku Solver QA version 0.1</h4><br/>
+        <h4>Sudoku Solver version 1.0</h4><br/>
         <p>Created by Jacob Mai Peng</p>
         <p>Thank you for checking out my sudoku solver! It uses a slightly
           modified version of the algorithm found
@@ -27,7 +27,7 @@ export function AboutModal(props) {
             href="https://github.com/pengmai/sudokufrontend"
             target="_blank"
             rel="noopener noreferrer">
-            {' Github (currently private).'}
+            {' Github.'}
           </a>
         </p>
         <br/>

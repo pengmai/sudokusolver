@@ -22,7 +22,7 @@ function solve(board, token) {
 
   var config = {
     method: 'POST',
-    url: '/api/v1/sudokuapi.php?request=solve',
+    url: '/api/sudokuapi.php?request=solve',
     headers: {
       'accept': 'application/json',
       'Authorization': 'Basic '+btoa('qauser1:123456')
