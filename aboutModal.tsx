@@ -1,14 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Modal, Button } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 
-export function AboutModal(props) {
+interface AboutModalProps {
+  showAbout: boolean;
+  hideModal: () => void;
+}
+
+export function AboutModal(props: AboutModalProps) {
   return (
     <Modal
       show={props.showAbout}
       onHide={props.hideModal}
-      dialogClassName="about-modal">
-      <Modal.Header closeButton>
+      dialogClassName="about-modal"
+    >
+      <Modal.Header closeButton={true}>
         <Modal.Title id="contained-modal-title-lg">About</Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -19,14 +24,16 @@ export function AboutModal(props) {
           <a
             href="https://github.com/aniketawati/Sudoku-Solver"
             target="_blank"
-            rel="noopener noreferrer">
+            rel="noopener noreferrer"
+          >
             {' here '}
           </a>
           and you can view the source code for the front end of this app on
           <a
             href="https://github.com/pengmai/sudokufrontend"
             target="_blank"
-            rel="noopener noreferrer">
+            rel="noopener noreferrer"
+          >
             {' Github.'}
           </a>
         </p>
@@ -43,9 +50,9 @@ export function AboutModal(props) {
         <p><strong>r</strong>: randomly set the board to one of 30 preset
           puzzles</p>
         <p><strong>a</strong>: display this &apos;About&apos; panel</p>
-        <p>Use <strong>i, j, k, & l</strong> to move around and the number
+        <p>Use <strong>i, j, k, &amp; l</strong> to move around and the number
           keys to input numbers into the board. Press
-          <strong>{' backspace' }</strong> or <strong>0</strong> to
+          <strong>{' backspace'}</strong> or <strong>0</strong> to
           erase the current number.</p>
         <br/>
         <h4>Your solver says my puzzle has no solution, but it does!</h4>
@@ -71,8 +78,3 @@ export function AboutModal(props) {
     </Modal>
   );
 }
-
-AboutModal.propTypes = {
-  showAbout: PropTypes.bool.isRequired,
-  hideModal: PropTypes.func.isRequired
-};

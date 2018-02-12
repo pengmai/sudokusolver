@@ -1,6 +1,8 @@
-function transposeArray(arr) {
-  var newArray = [];
-  var i, j;
+function transposeArray(arr: number[][]) {
+  const newArray: number[][] = [];
+  let i: number;
+  let j: number;
+
   for (i = 0; i < arr.length; i++) {
     newArray.push([]);
   }
@@ -14,25 +16,30 @@ function transposeArray(arr) {
   return newArray;
 }
 
+interface DuplicateOccurrences {
+  [key: string]: number[];
+}
+
 /**
  * Return an array of all instances of duplicate elements in arr.
  */
-function findDuplicates(arr) {
-  var occurrences = {};
+function findDuplicates(arr: number[]) {
+  const occurrences: DuplicateOccurrences = {};
   // Collect indices of occurrences, ignoring zero values.
-  for (var i = 0; i < arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     if (arr[i] > 0) {
-      if (occurrences.hasOwnProperty(arr[i])) {
-        occurrences[arr[i]].push(i);
+      const k = String(arr[i]);
+      if (occurrences.hasOwnProperty(k)) {
+        occurrences[k].push(i);
       } else {
-        occurrences[arr[i]] = [i];
+        occurrences[k] = [i];
       }
     }
   }
 
   // Process occurrences.
-  var dup = [];
-  for (var key in occurrences) {
+  let dup: number[] = [];
+  for (const key in occurrences) {
     if (occurrences.hasOwnProperty(key) && occurrences[key].length > 1) {
       dup = dup.concat(occurrences[key]);
     }
@@ -40,12 +47,20 @@ function findDuplicates(arr) {
   return dup;
 }
 
-function checkConflicts(board) {
+interface CoordinateMap {
+  [key: string]: number[];
+}
+
+function checkConflicts(board: number[][]) {
   // Initialize valid to a 9x9 row of 1's
-  var line = [];
-  for (let i = 0; i < 9; i++) line[i] = 1;
-  var valid = [];
-  var i, j, duplicates;
+  const line: number[] = [];
+  let i: number = 0;
+  for (i = 0; i < 9; i++) { line[i] = 1; }
+  const valid: number[][] = [];
+
+  let j: number = 0;
+  let duplicates: number[];
+
   for (i = 0; i < 9; i++) {
     valid.push(line.slice());
   }
@@ -68,28 +83,28 @@ function checkConflicts(board) {
   // Check sub-squares.
   for (i = 0; i < 9; i += 3) {
     for (j = 0; j < 9; j += 3) {
-      var coordinates = {};
-      var subSquare = [];
-      for (var di = 0; di < 3; di++) {
-        for (var dj = 0; dj < 3; dj++) {
+      const coordinates: CoordinateMap = {};
+      const subSquare = [];
+      for (let di = 0; di < 3; di++) {
+        for (let dj = 0; dj < 3; dj++) {
           subSquare.push(board[i + di][j + dj]);
           coordinates[subSquare.length - 1] = [i + di, j + dj];
         }
       }
       duplicates = findDuplicates(subSquare);
-      for (var k = 0; k < duplicates.length; k++) {
-        valid[coordinates[duplicates[k]][0]][coordinates[duplicates[k]][1]] = 0;
+      for (const val of duplicates) {
+        valid[coordinates[val][0]][coordinates[val][1]] = 0;
       }
     }
   }
   return valid;
 }
 
-function hasConflicts(valid) {
-  var i = valid.length;
+function hasConflicts(valid: number[][]) {
+  let i = valid.length;
 
   while (i--) {
-    var j = valid[i].length;
+    let j = valid[i].length;
     while (j--) {
       if (valid[i][j] === 0) {
         return true;
