@@ -1,6 +1,6 @@
 /*
-Adapted from Pankaj Kumar's javascript translation of Peter Norvig's Solving
-Every Sudoku Puzzle, rewritten as a web worker in Typescript.
+Adapted from Pankaj Kumar's JavaScript translation of Peter Norvig's Solving
+Every Sudoku Puzzle, rewritten as a web worker in TypeScript.
 
 http://pankaj-k.net/weblog/2007/03/sudoku_solving_program_transla.html
 */
