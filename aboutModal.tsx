@@ -17,20 +17,28 @@ export function AboutModal(props: AboutModalProps) {
         <Modal.Title id="contained-modal-title-lg">About</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <h4>Sudoku Solver version 1.0</h4><br/>
+        <h4>Sudoku Solver version 1.1</h4><br/>
         <p>Created by Jacob Mai Peng</p>
-        <p>Thank you for checking out my sudoku solver! It uses a slightly
-          modified version of the algorithm found
+        <p>Thank you for checking out my sudoku solver! It uses a modified
+          version of Pankaj Kumar&apos;s
           <a
-            href="https://github.com/aniketawati/Sudoku-Solver"
+            href="http://pankaj-k.net/weblog/2007/03/sudoku_solving_program_transla.html"
             target="_blank"
             rel="noopener noreferrer"
           >
-            {' here '}
+            {' translation '}
           </a>
-          and you can view the source code for the front end of this app on
+          of Peter Norvig's excellent sudoku solver from his
           <a
-            href="https://github.com/pengmai/sudokufrontend"
+            href="http://norvig.com/sudoku.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {' article '}
+          </a>
+          on the subject. You can view the source code for this app on my
+          <a
+            href="https://github.com/pengmai/sudokusolver"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -55,20 +63,6 @@ export function AboutModal(props: AboutModalProps) {
           <strong>{' backspace'}</strong> or <strong>0</strong> to
           erase the current number.</p>
         <br/>
-        <h4>Your solver says my puzzle has no solution, but it does!</h4>
-        <p>This is certainly possible. The solver will time out after
-          executing for 5 seconds, at which point it assumes that the puzzle
-          has no solution. Note that this timeout occurs on the server side, so
-          you will occasionally see &apos;time elapsed&apos; values of greater
-          than 5 seconds because the timeout does not factor in the time to
-          communicate with the server. The algorithm used is quite efficient at
-          finding solutions for puzzles that have at least one solution, but not
-          very efficient for determining that a puzzle has no solutions. The
-          only times where I&apos;ve personally seen it take more than about 2
-          seconds on a puzzle are for puzzles with no solution, so if you
-          discover a puzzle with a unique solution that causes the solver to
-          time out, let me know at <strong>jacobmpeng@gmail.com</strong>.
-        </p>
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={props.hideModal}>
