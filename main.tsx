@@ -7,16 +7,16 @@ import { AboutModal } from './aboutModal';
 import { DropupMenu } from './dropupMenu';
 import { puzzles } from './puzzles';
 
-import { CancelTokenSource } from 'axios';
 import range from 'lodash/range';
 import Board from './board';
-import Client from './client';
+import solver from './solver.worker';
 import Sudoku from './sudoku';
+import WebWorker from './webWorker';
 
 import './numberselector.css';
 
 // Constants
-const SPRING_PARAMS = {stiffness: 170, damping: 19};
+const SPRING_PARAMS = { stiffness: 170, damping: 19 };
 const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
 const NUM_CHILDREN = 10; // 9 options + 1 blank.
 const SEPARATION_ANGLE = 36; // in degrees.
@@ -48,10 +48,11 @@ interface SudokuSolverState {
   selecting: boolean;
   showAbout: boolean;
   solved: boolean;
-  token: CancelTokenSource;
+  started: number;
   valid: number[][];
   windowHeight: number;
   windowWidth: number;
+  worker: Worker;
 }
 
 export default class SudokuSolver extends React.Component<{}, SudokuSolverState> {
@@ -72,10 +73,11 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
       selecting: false,
       showAbout: false,
       solved: false,
-      token: Client.newCancelToken(),
+      started: 0,
       valid,
-      windowHeight: 0,
-      windowWidth: 0
+      windowHeight: window.innerHeight,
+      windowWidth: window.innerWidth,
+      worker: WebWorker(solver)
     };
   }
 
@@ -83,12 +85,13 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
     this.updateWindowDimensions();
     window.addEventListener('resize', this.updateWindowDimensions);
     window.addEventListener('keydown', this.handleKeyDown);
+    this.state.worker.onmessage = this.onWorkerReturn;
   }
 
   public componentWillUnmount() {
     window.removeEventListener('resize', this.updateWindowDimensions);
     window.removeEventListener('keydown', this.handleKeyDown);
-    Client.cancel(this.state.token);
+    this.state.worker.terminate();
   }
 
   public render() {
@@ -165,19 +168,29 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
   }
 
   public updateWindowDimensions = () => {
+    const documentElement = document.documentElement
+      ? document.documentElement
+      : {
+        clientHeight: 0,
+        clientWidth: 0,
+        offsetHeight: 0,
+        offsetWidth: 0,
+        scrollHeight: 0,
+        scrollWidth: 0
+      };
     const jQueryWidth = Math.max(
-      document.documentElement.clientWidth,
+      documentElement.clientWidth,
       document.body.scrollWidth,
-      document.documentElement.scrollWidth,
+      documentElement.scrollWidth,
       document.body.offsetWidth,
-      document.documentElement.offsetWidth
+      documentElement.offsetWidth
     );
     const jQueryHeight = Math.max(
-      document.documentElement.clientHeight,
+      documentElement.clientHeight,
       document.body.scrollHeight,
-      document.documentElement.scrollHeight,
+      documentElement.scrollHeight,
       document.body.offsetHeight,
-      document.documentElement.offsetHeight
+      documentElement.offsetHeight
     );
     this.setState({
       windowHeight: window.innerHeight > jQueryHeight ? jQueryHeight : window.innerHeight,
@@ -325,42 +338,38 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
       return;
     }
 
-    const start = new Date();
-    this.setState({
-      buttonMessage: 'Solving...',
-      loading: true,
-      selecting: false
-    });
-    Client.solve(this.state.board, this.state.token)
-      .then((response) => {
-        const elapsed = new Date().getTime() - start.getTime();
-        this.setState({
-          alert: `Solved! Time elapsed: ${elapsed} milliseconds`,
-          board: response.solution,
-          buttonMessage: 'Reset',
-          loading: false,
-          solved: true
-        });
-      }).catch((err) => {
-        if (Client.isCancelled(err)) {
-          // The component was unmounted, do nothing.
-          return;
-        }
+    this.setState(
+      {
+        buttonMessage: 'Solving...',
+        loading: true,
+        selecting: false,
+        started: Date.now()
+      },
+      () => {
+        const puzzle = this.state.board.map((row) => row.join('')).join('');
+        this.state.worker.postMessage(puzzle);
+      }
+    );
+  }
 
-        let error = '';
-        if (err.hasOwnProperty('response') && err.response.status === 422) {
-          error = `There appear to be no possible solutions to the puzzle you
-            have entered.`;
-        } else {
-          error = 'An unknown error has occurred. Please try again.';
-        }
-        this.setState({
-          alert: error,
-          buttonMessage: 'Solve',
-          loading: false,
-          solved: false
-        });
+  public onWorkerReturn = (event: MessageEvent) => {
+    if (event.data.hasOwnProperty('error')) {
+      this.setState({
+        alert: event.data.error,
+        buttonMessage: 'Solve',
+        loading: false,
+        solved: false
       });
+    } else {
+      const elapsed = Date.now() - this.state.started;
+      this.setState({
+        alert: `Solved! Time elapsed: ${elapsed} milliseconds`,
+        board: event.data,
+        buttonMessage: 'Reset',
+        loading: false,
+        solved: true
+      });
+    }
   }
 
   public handleButton() {
