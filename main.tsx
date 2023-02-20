@@ -1,13 +1,11 @@
 import React from 'react';
-import {
-  Alert, Button, ButtonGroup
-} from 'react-bootstrap';
+import ReactDOM from 'react-dom';
+import { Alert, Button, ButtonGroup } from 'react-bootstrap';
 import { Motion, spring } from 'react-motion';
 import { AboutModal } from './aboutModal';
 import { DropupMenu } from './dropupMenu';
 import { puzzles } from './puzzles';
 
-import range from 'lodash/range';
 import Board from './board';
 import solver from './solver.worker';
 import Sudoku from './sudoku';
@@ -15,13 +13,19 @@ import WebWorker from './webWorker';
 
 import './numberselector.css';
 
+const range = (n: number) => {
+  const arr = new Array(n);
+  for (let i = 0; i < n; i++) arr[i] = i;
+  return arr;
+};
+
 // Constants
 const SPRING_PARAMS = { stiffness: 170, damping: 19 };
 const DEG_TO_RAD = 0.0174533; // Value of 1 degree in radians.
 const NUM_CHILDREN = 10; // 9 options + 1 blank.
 const SEPARATION_ANGLE = 36; // in degrees.
 const FAN_ANGLE = (NUM_CHILDREN - 1) * SEPARATION_ANGLE; // in degrees.
-const BASE_ANGLE = ((180 - FAN_ANGLE) / 2); // in degrees.
+const BASE_ANGLE = (180 - FAN_ANGLE) / 2; // in degrees.
 
 // Utilities for the input animation
 function toRadians(degrees: number) {
@@ -29,10 +33,10 @@ function toRadians(degrees: number) {
 }
 
 function finalDeltaPositions(index: number, buttonDiam: number, flyOutRadius: number) {
-  const angle = BASE_ANGLE + (index * SEPARATION_ANGLE);
+  const angle = BASE_ANGLE + index * SEPARATION_ANGLE;
   return {
-    deltaX: flyOutRadius * Math.cos(toRadians(angle)) - (buttonDiam / 2),
-    deltaY: flyOutRadius * Math.sin(toRadians(angle)) + (buttonDiam / 2)
+    deltaX: flyOutRadius * Math.cos(toRadians(angle)) - buttonDiam / 2,
+    deltaY: flyOutRadius * Math.sin(toRadians(angle)) + buttonDiam / 2,
   };
 }
 
@@ -77,7 +81,7 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
       valid,
       windowHeight: window.innerHeight,
       windowWidth: window.innerWidth,
-      worker: WebWorker(solver)
+      worker: WebWorker(solver),
     };
   }
 
@@ -97,12 +101,13 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
   public render() {
     return (
       <div>
-        {range(NUM_CHILDREN).map((index) => {
-          const style = this.state.selecting ? this.finalButtonStyles(index) :
-            this.initialButtonStyles();
+        {range(NUM_CHILDREN).map(index => {
+          const style = this.state.selecting
+            ? this.finalButtonStyles(index)
+            : this.initialButtonStyles();
           return (
             <Motion style={style} key={index}>
-              {({width, height, top, left, zIndex}) =>
+              {({ width, height, top, left, zIndex }) => (
                 <div
                   className="child-button"
                   style={{
@@ -110,22 +115,25 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
                     left,
                     top,
                     width,
-                    zIndex
+                    zIndex,
                   }}
                   onClick={() => this.updateBoard(index)}
                 >
                   {index > 0 ? index : ''}
-                </div>}
+                </div>
+              )}
             </Motion>
           );
         })}
 
         <div className="text-center">
-          {this.state.alert === '' ? '' :
+          {this.state.alert === '' ? (
+            ''
+          ) : (
             <Alert bsStyle="info">
               <p>{this.state.alert}</p>
             </Alert>
-          }
+          )}
         </div>
 
         <Board
@@ -142,14 +150,15 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
             id="solve-button"
             bsSize="large"
             disabled={this.state.cannotSolve || this.state.loading}
-            onClick={() => (this.state.cannotSolve || this.state.loading ?
-              null : this.handleButton())}
+            onClick={() =>
+              this.state.cannotSolve || this.state.loading ? null : this.handleButton()
+            }
           >
             {this.state.buttonMessage}
           </Button>
           <DropupMenu
             solved={this.state.solved}
-            onClick={() => this.setState({selecting: false})}
+            onClick={() => this.setState({ selecting: false })}
             reset={this.resetBoard}
             random={this.randomPuzzle}
             about={this.showModal}
@@ -159,10 +168,7 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
           />
         </ButtonGroup>
 
-        <AboutModal
-          showAbout={this.state.showAbout}
-          hideModal={this.hideModal}
-        />
+        <AboutModal showAbout={this.state.showAbout} hideModal={this.hideModal} />
       </div>
     );
   }
@@ -171,13 +177,13 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
     const documentElement = document.documentElement
       ? document.documentElement
       : {
-        clientHeight: 0,
-        clientWidth: 0,
-        offsetHeight: 0,
-        offsetWidth: 0,
-        scrollHeight: 0,
-        scrollWidth: 0
-      };
+          clientHeight: 0,
+          clientWidth: 0,
+          offsetHeight: 0,
+          offsetWidth: 0,
+          scrollHeight: 0,
+          scrollWidth: 0,
+        };
     const jQueryWidth = Math.max(
       documentElement.clientWidth,
       document.body.scrollWidth,
@@ -194,16 +200,16 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
     );
     this.setState({
       windowHeight: window.innerHeight > jQueryHeight ? jQueryHeight : window.innerHeight,
-      windowWidth: window.innerWidth > jQueryWidth ? jQueryWidth : window.innerWidth
+      windowWidth: window.innerWidth > jQueryWidth ? jQueryWidth : window.innerWidth,
     });
-  }
+  };
 
   public handleKeyDown = (event: KeyboardEvent) => {
     if (!this.state.keyboardOn) {
       // Pressing any key will turn on keyboard mode.
       this.setState({
-        alert: 'You just turned on keyboard mode! Press \'a\' for more info.',
-        keyboardOn: true
+        alert: "You just turned on keyboard mode! Press 'a' for more info.",
+        keyboardOn: true,
       });
       return;
     } else if (!this.state.showAbout && event.key === 'Escape') {
@@ -217,42 +223,52 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
     }
 
     switch (event.key.toLowerCase()) {
-    case 'a':
-      this.showModal();
-      break;
-    case 'c':
-      this.resetBoard();
-      break;
-    case 'r':
-      this.randomPuzzle();
-      break;
-    case 's':
-      this.solveBoard();
-      break;
-    case 'i':
-      if (this.state.row > 0) { this.setState({ row: this.state.row - 1 }); }
-      break;
-    case 'k':
-      if (this.state.row < 8) { this.setState({ row: this.state.row + 1 }); }
-      break;
-    case 'j':
-      if (this.state.col > 0) { this.setState({ col: this.state.col - 1 }); }
-      break;
-    case 'l':
-      if (this.state.col < 8) { this.setState({ col: this.state.col + 1 }); }
-      break;
-    case 'backspace':
-      this.updateBoard(0);
-      break;
-    default:
-      // Do nothing.
-      break;
+      case 'a':
+        this.showModal();
+        break;
+      case 'c':
+        this.resetBoard();
+        break;
+      case 'r':
+        this.randomPuzzle();
+        break;
+      case 's':
+        this.solveBoard();
+        break;
+      case 'i':
+        if (this.state.row > 0) {
+          this.setState({ row: this.state.row - 1 });
+        }
+        break;
+      case 'k':
+        if (this.state.row < 8) {
+          this.setState({ row: this.state.row + 1 });
+        }
+        break;
+      case 'j':
+        if (this.state.col > 0) {
+          this.setState({ col: this.state.col - 1 });
+        }
+        break;
+      case 'l':
+        if (this.state.col < 8) {
+          this.setState({ col: this.state.col + 1 });
+        }
+        break;
+      case 'backspace':
+        this.updateBoard(0);
+        break;
+      default:
+        // Do nothing.
+        break;
     }
-  }
+  };
 
   public getBoardSetTo(i: number) {
     const row = [];
-    for (let j = 0; j < 9; ++j) { row[j] = i; }
+    for (let j = 0; j < 9; ++j) {
+      row[j] = i;
+    }
     const rows = [];
     for (let k = 0; k < 9; k++) {
       rows.push(row.slice());
@@ -271,13 +287,13 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
     // Clicking the same square twice will dismiss the selection buttons.
     if (row === this.state.row && col === this.state.col) {
       this.setState({
-        selecting: !this.state.selecting
+        selecting: !this.state.selecting,
       });
     } else {
       this.setState({
         col,
         row,
-        selecting: true
+        selecting: true,
       });
     }
   }
@@ -297,7 +313,7 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
       board,
       cannotSolve,
       selecting: false,
-      valid
+      valid,
     });
   }
 
@@ -313,9 +329,9 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
       buttonMessage: 'Solve',
       cannotSolve: false,
       solved: false,
-      valid
+      valid,
     });
-  }
+  };
 
   public resetBoard = () => {
     if (this.state.loading) {
@@ -329,9 +345,9 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
       buttonMessage: 'Solve',
       cannotSolve: false,
       solved: false,
-      valid
+      valid,
     });
-  }
+  };
 
   public solveBoard() {
     if (this.state.solved || this.state.loading || this.state.cannotSolve) {
@@ -343,10 +359,10 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
         buttonMessage: 'Solving...',
         loading: true,
         selecting: false,
-        started: Date.now()
+        started: Date.now(),
       },
       () => {
-        const puzzle = this.state.board.map((row) => row.join('')).join('');
+        const puzzle = this.state.board.map(row => row.join('')).join('');
         this.state.worker.postMessage(puzzle);
       }
     );
@@ -358,7 +374,7 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
         alert: event.data.error,
         buttonMessage: 'Solve',
         loading: false,
-        solved: false
+        solved: false,
       });
     } else {
       const elapsed = Date.now() - this.state.started;
@@ -367,10 +383,10 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
         board: event.data,
         buttonMessage: 'Reset',
         loading: false,
-        solved: true
+        solved: true,
       });
     }
-  }
+  };
 
   public handleButton() {
     if (this.state.solved) {
@@ -396,17 +412,15 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
       buttonDiam = 30;
     }
     // The middle coordinates that the selection buttons should surround.
-    const mX = (this.state.windowWidth / 2)
-      + ((this.state.col - 4) * squareWidth);
-    const mY = (this.state.windowHeight / 2)
-      + ((this.state.row - 4) * squareWidth);
+    const mX = this.state.windowWidth / 2 + (this.state.col - 4) * squareWidth;
+    const mY = this.state.windowHeight / 2 + (this.state.row - 4) * squareWidth;
 
     return {
       height: buttonDiam,
-      left: spring(mX - (buttonDiam / 2), SPRING_PARAMS),
-      top: spring(mY - (buttonDiam / 2), SPRING_PARAMS),
+      left: spring(mX - buttonDiam / 2, SPRING_PARAMS),
+      top: spring(mY - buttonDiam / 2, SPRING_PARAMS),
       width: buttonDiam,
-      zIndex: spring(-1, {stiffness: 2500, damping: 50})
+      zIndex: spring(-1, { stiffness: 2500, damping: 50 }),
     };
   }
 
@@ -429,27 +443,24 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
       buttonDiam = 30;
       flyOutRadius = 50;
     }
-    const {deltaX, deltaY} = finalDeltaPositions(index, buttonDiam, flyOutRadius);
+    const { deltaX, deltaY } = finalDeltaPositions(index, buttonDiam, flyOutRadius);
     // The middle coordinates that the selection buttons should surround.
-    let mX = (this.state.windowWidth / 2)
-      + ((this.state.col - 4) * squareWidth);
-    const mY = (this.state.windowHeight / 2)
-      + ((this.state.row - 4) * squareWidth);
+    let mX = this.state.windowWidth / 2 + (this.state.col - 4) * squareWidth;
+    const mY = this.state.windowHeight / 2 + (this.state.row - 4) * squareWidth;
 
     // Ensure all buttons are visible, even on smallest viewports.
     if (320 < this.state.windowWidth && this.state.windowWidth < 440) {
       if (this.state.col === 0) {
-        mX -= ((this.state.windowWidth / 2) - 220);
+        mX -= this.state.windowWidth / 2 - 220;
       } else if (this.state.col === 8) {
-        mX += ((this.state.windowWidth / 2) - 220);
+        mX += this.state.windowWidth / 2 - 220;
       }
     } else if (this.state.windowWidth <= 320) {
       // iPhone 5 and older.
       if (this.state.col < 2) {
-        mX -= ((this.state.windowWidth / 2) - 203 + (this.state.col * 33));
+        mX -= this.state.windowWidth / 2 - 203 + this.state.col * 33;
       } else if (this.state.col > 6) {
-        mX += ((this.state.windowWidth / 2) - 203 + (this.state.col === 8 ? 0 :
-          33));
+        mX += this.state.windowWidth / 2 - 203 + (this.state.col === 8 ? 0 : 33);
       }
     }
 
@@ -458,22 +469,24 @@ export default class SudokuSolver extends React.Component<{}, SudokuSolverState>
       left: spring(mX + deltaX, SPRING_PARAMS),
       top: spring(mY - deltaY, SPRING_PARAMS),
       width: buttonDiam,
-      zIndex: 1
+      zIndex: 1,
     };
   }
 
   public showModal = () => {
-    this.setState({showAbout: true});
-  }
+    this.setState({ showAbout: true });
+  };
 
   public hideModal = () => {
-    this.setState({showAbout: false});
-  }
+    this.setState({ showAbout: false });
+  };
 
   public keyboardOff = () => {
     this.setState({
       alert: `Keyboard mode is turned off. Press any key to turn it on again.`,
       keyboardOn: false,
     });
-  }
+  };
 }
+
+ReactDOM.render(<SudokuSolver />, document.getElementById('sudoku-root'));

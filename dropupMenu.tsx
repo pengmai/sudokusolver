@@ -1,6 +1,5 @@
 import React from 'react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
 
 export interface Props {
   onClick: () => void;
@@ -25,11 +24,7 @@ export function DropupMenu(props: Props) {
       title=""
       onClick={props.onClick}
     >
-      <MenuItem
-        className="dropup-item"
-        eventKey="1"
-        onClick={props.about}
-      >
+      <MenuItem className="dropup-item" eventKey="1" onClick={props.about}>
         About
       </MenuItem>
       <MenuItem
@@ -40,26 +35,28 @@ export function DropupMenu(props: Props) {
       >
         Random Puzzle
       </MenuItem>
-      <LinkContainer className="dropup-item" exact={true} to="/code">
-        <MenuItem eventKey="3">
-          Back to Site
+      <MenuItem className="dropup-item" href="/code" eventKey="3">
+        Back to Site
+      </MenuItem>
+      {props.keyboardOn ? (
+        <MenuItem className="dropup-item" eventKey="4" onClick={props.keyboardOff}>
+          Turn Keyboard Mode Off
         </MenuItem>
-      </LinkContainer>
-      {props.keyboardOn ? <MenuItem
-        className="dropup-item"
-        eventKey="4"
-        onClick={props.keyboardOff}
-      >
-        Turn Keyboard Mode Off
-      </MenuItem> : ''}
-      {props.solved ? '' : <MenuItem
-        className="dropup-item"
-        eventKey="5"
-        disabled={props.loading}
-        onClick={props.reset}
-      >
-        Reset Board
-      </MenuItem>}
+      ) : (
+        ''
+      )}
+      {props.solved ? (
+        ''
+      ) : (
+        <MenuItem
+          className="dropup-item"
+          eventKey="5"
+          disabled={props.loading}
+          onClick={props.reset}
+        >
+          Reset Board
+        </MenuItem>
+      )}
     </DropdownButton>
   );
 }
